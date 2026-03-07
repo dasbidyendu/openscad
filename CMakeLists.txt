@@ -1320,6 +1320,16 @@ set(GUI_SOURCES
   src/gui/SettingsWriter.cc
   src/gui/TabManager.cc
   src/gui/UIUtils.cc
+  src/gui/ai/AIDock.h
+  src/gui/ai/AIDock.cc
+  src/gui/ai/ChatModel.h
+  src/gui/ai/ChatModel.cc
+  src/gui/ai/ChatDelegate.h
+  src/gui/ai/ChatDelegate.cc
+  src/gui/ai/AIService.h
+  src/gui/ai/AIService.cc
+  src/gui/ai/DiffDialog.h
+  src/gui/ai/DiffDialog.cc
   src/gui/WindowManager.cc
   src/gui/IgnoreWheelWhenNotFocused.cc
   src/gui/input/AxisConfigWidget.cc
@@ -1394,6 +1404,8 @@ set(GUI_HEADERS
     src/gui/TabManager.h
     src/gui/UIUtils.h
     src/gui/ViewportControl.h
+    src/gui/ai/AIService.h
+    src/gui/ai/DiffDialog.h
     src/gui/WindowManager.h
     src/gui/qt-obsolete.h
     src/gui/qtgettext.h

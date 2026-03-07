@@ -114,6 +114,9 @@
 #include "gui/CGALWorker.h"
 #include "gui/ColorList.h"
 #include "gui/Dock.h"
+#include "gui/ai/AIDock.h"
+#include "gui/ai/DiffDialog.h"
+#include "gui/ai/AIService.h"
 #include "gui/Editor.h"
 #include "gui/Export3mfDialog.h"
 #include "gui/ExportPdfDialog.h"
@@ -284,6 +287,7 @@ MainWindow::MainWindow(const QStringList& filenames) : rubberBandManager(this)
   setupAnimate();
   setupEditor(filenames);
   setupCustomizer();
+  setupAIDock();
   setupErrorLog();
   setupFontList();
   setupColorList();
@@ -554,6 +558,7 @@ void MainWindow::updateUndockMode(bool undockMode)
     fontListDock->setFeatures(fontListDock->features() | QDockWidget::DockWidgetFloatable);
     colorListDock->setFeatures(colorListDock->features() | QDockWidget::DockWidgetFloatable);
     viewportControlDock->setFeatures(viewportControlDock->features() | QDockWidget::DockWidgetFloatable);
+    aiDock->setFeatures(aiDock->features() | QDockWidget::DockWidgetFloatable);
   } else {
     if (editorDock->isFloating()) {
       editorDock->setFloating(false);
@@ -595,6 +600,11 @@ void MainWindow::updateUndockMode(bool undockMode)
     }
     viewportControlDock->setFeatures(viewportControlDock->features() &
                                      ~QDockWidget::DockWidgetFloatable);
+
+    if (aiDock->isFloating()) {
+      aiDock->setFloating(false);
+    }
+    aiDock->setFeatures(aiDock->features() & ~QDockWidget::DockWidgetFloatable);
   }
 }
 
@@ -2892,6 +2902,54 @@ void MainWindow::onParametersDockVisibilityChanged(bool isVisible)
   }
 }
 
+void MainWindow::onAIDockVisibilityChanged(bool isVisible)
+{
+}
+
+void MainWindow::onAIResponseReceived(const QString& text)
+{
+  if (this->aiDock) {
+    this->aiDock->setLoading(false);
+    this->aiDock->addMessage(text, false);
+  }
+}
+
+void MainWindow::onAIErrorOccurred(const QString& error)
+{
+  if (this->aiDock) {
+    this->aiDock->setLoading(false);
+    this->aiDock->addMessage(QString("Error: %1").arg(error), false);
+  }
+}
+
+void MainWindow::onAIToolCallReceived(const QString& toolCallId, const QString& toolName,
+                                      const QJsonObject& arguments)
+{
+  if (this->aiDock) this->aiDock->setLoading(false);
+  if (toolName == "set_editor_code") {
+    if (this->aiDock) {
+      QString code = arguments["code"].toString();
+      this->aiDock->proposeCode(code);
+    }
+  } else if (toolName == "trigger_preview") {
+    this->on_designActionPreview_triggered();
+  } else if (toolName == "get_editor_code") {
+    if (this->activeEditor && this->aiDock) {
+      QString editorCode = this->activeEditor->toPlainText();
+      this->aiDock->addMessage(QString("AI accessed your current script."), false);
+      this->aiDock->setLoading(true);
+      this->aiService->sendToolResponse(toolCallId, editorCode, this->aiDock->getHistoryAsJson());
+    }
+  } else if (toolName == "get_console_output") {
+    if (this->aiDock && this->console) {
+      QString log = this->console->toPlainText();
+      this->aiDock->addMessage(QString("AI reviewed the console logs."), false);
+      this->aiDock->setLoading(true);
+      this->aiService->sendToolResponse(toolCallId, log, this->aiDock->getHistoryAsJson());
+    }
+  }
+}
+
 void MainWindow::onColorListColorSelected(const QString& selectedColor)
 {
   activeEditor->insertOrReplaceText(selectedColor);
@@ -3542,6 +3600,90 @@ void MainWindow::setupCustomizer()
 }
 
 /**
+  Set up resources related to the AI Chat dock widget
+ */
+void MainWindow::setupAIDock()
+{
+  this->aiDock = new AIDock(this);
+  addDockWidget(Qt::RightDockWidgetArea, this->aiDock);
+  this->aiDock->hide();
+
+  this->aiService = new AIService(this);
+
+  QObject::connect(this->aiDock, &Dock::visibilityChanged, this, &MainWindow::onAIDockVisibilityChanged);
+
+  QObject::connect(this->aiDock, &AIDock::messageSubmitted, this, [this](const QString& text) {
+    QString context =
+      "You are the OpenSCAD Expert Assistant. You provide high-quality, surgical, and logical OpenSCAD "
+      "code fixes.\n\n"
+      "### YOUR CORE RULES:\n"
+      "1. **Surgical Excellence**: If the user has a minor error (missing semicolon, wrong bracket), "
+      "fix ONLY that specific line. Do NOT rewrite the entire script, do NOT rename variables, and "
+      "do NOT change the overall logic unless explicitly asked.\n"
+      "2. **OpenSCAD Syntax Mastery**:\n"
+      "   - **Modifiers**: `color()`, `rotate()`, `translate()`, etc., are MODIFIERS. They apply to the "
+      "next child or block. NEVER assign them to variables like `c = color(\"red\");`. Instead, use "
+      "`color(\"red\") cube(10);`.\n"
+      "   - **Semicolons**: Every assignment (e.g., `x = 5;`) and every module instantiation "
+      "(e.g., `cube(10);`) MUST end with a semicolon. Semicolons are NOT used after module "
+      "definitions `module name() { ... }` or after blocks `{ ... }`.\n"
+      "3. **Tool Workflow**:\n"
+      "   - Use `get_editor_code()` if you need to see the latest script state.\n"
+      "   - Use `set_editor_code()` to propose the fix. Always return the COMPLETE fixed script "
+      "but minimize changes.\n"
+      "   - Use `trigger_preview()` once after setting the code to validate the result.\n"
+      "4. **Formatting**: Use ACTUAL NEWLINES in your code output. Never use literal '\\n' sequences.\n"
+      "5. **Tone**: Technical, concise, and helpful. Avoid long conversational filler.\n";
+    if (this->activeEditor) {
+      context += QString("\n### Active Script Context:\n```openscad\n%1\n```\n")
+                   .arg(this->activeEditor->toPlainText());
+    }
+    if (this->console) {
+      QString log = this->console->toPlainText();
+      QStringList lines = log.split('\n');
+      qsizetype start = std::max<qsizetype>(0, lines.size() - 30);
+      context += QString("\n### Recent Console Logs:\n%1\n").arg(lines.mid(start).join('\n'));
+    }
+    this->aiDock->setLoading(true);
+    this->aiService->sendMessage(text, this->aiDock->getHistoryAsJson(), context);
+  });
+
+  QObject::connect(this->aiDock, &AIDock::applyCodeRequested, this, [this](const QString& code) {
+    if (this->activeEditor) {
+      // Sanitization: Fix escaped newlines if the model messed up
+      QString cleanCode = code;
+      cleanCode.replace("\\n", "\n").replace("\\\"", "\"");
+      this->activeEditor->setText(cleanCode);
+      this->on_designActionPreview_triggered();
+    }
+  });
+
+  QObject::connect(this->aiDock, &AIDock::reviewCodeRequested, this,
+                   &MainWindow::onAIReviewCodeRequested);
+
+  QObject::connect(this->aiService, &AIService::responseReceived, this,
+                   &MainWindow::onAIResponseReceived);
+  QObject::connect(this->aiService, &AIService::errorOccurred, this, &MainWindow::onAIErrorOccurred);
+  QObject::connect(this->aiService, &AIService::toolCallReceived, this,
+                   &MainWindow::onAIToolCallReceived);
+}
+
+void MainWindow::onAIReviewCodeRequested(const QString& code)
+{
+  if (!this->activeEditor) return;
+  // Sanitization: Fix escaped newlines if the model messed up
+  QString cleanCode = code;
+  cleanCode.replace("\\n", "\n").replace("\\\"", "\"");
+
+  QString currentCode = this->activeEditor->toPlainText();
+  DiffDialog dialog(currentCode, cleanCode, this);
+  if (dialog.exec() == QDialog::Accepted) {
+    this->activeEditor->setText(cleanCode);
+    this->on_designActionPreview_triggered();
+  }
+}
+
+/**
   Set up resources related to the Animate dock widget
  */
 void MainWindow::setupAnimate()
@@ -3648,6 +3790,7 @@ void MainWindow::setupDocks()
     {fontListDock, _("&Font List")},
     {colorListDock, _("C&olor List")},
     {viewportControlDock, _("&Viewport-Control")},
+    {aiDock, _("&AI Chat")},
   };
   // clang-format off
 

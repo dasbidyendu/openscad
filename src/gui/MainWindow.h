@@ -45,6 +45,8 @@ Q_IMPORT_PLUGIN(QSvgPlugin)
 
 class BuiltinContext;
 class CGALWorker;
+class AIDock;
+class AIService;
 class CSGNode;
 class CSGProducts;
 class FontListDialog;
@@ -101,6 +103,8 @@ public:
   Tree tree;
   EditorInterface *activeEditor = nullptr;
   TabManager *tabManager;
+  AIDock *aiDock;
+  AIService *aiService;
 
   std::shared_ptr<const Geometry> rootGeom;
   std::shared_ptr<Renderer> geomRenderer;
@@ -143,6 +147,7 @@ private:
   void setupErrorLog();
   void setupEditor(const QStringList& filenames);
   void setupCustomizer();
+  void setupAIDock();
   void setupAnimate();
   void setupFontList();
   void setupColorList();
@@ -306,6 +311,12 @@ private slots:
   void onColorListDockVisibilityChanged(bool isVisible);
   void onViewportControlDockVisibilityChanged(bool isVisible);
   void onParametersDockVisibilityChanged(bool isVisible);
+  void onAIDockVisibilityChanged(bool isVisible);
+  void onAIToolCallReceived(const QString& toolCallId, const QString& toolName,
+                            const QJsonObject& arguments);
+  void onAIReviewCodeRequested(const QString& code);
+  void onAIResponseReceived(const QString& text);
+  void onAIErrorOccurred(const QString& error);
 
   void onColorListColorSelected(const QString&);
 
