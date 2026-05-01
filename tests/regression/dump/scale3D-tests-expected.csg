@@ -40,4 +40,3 @@ linear_extrude(height = 100, $fn = 0, $fa = 12, $fs = 2) {
 		}
 	}
 }
-

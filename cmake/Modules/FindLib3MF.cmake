@@ -74,4 +74,3 @@ if (Lib3MF_FOUND)
     )
   endif()
 endif()
-

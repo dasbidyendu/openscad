@@ -19,4 +19,3 @@ hull() {
 	}
 }
 cylinder($fn = 0, $fa = 12, $fs = 0.1, h = 40, r1 = 1, r2 = 1, center = false);
-

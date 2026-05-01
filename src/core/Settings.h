@@ -404,6 +404,10 @@ public:
   static SettingsEntryBool enableNumberScrollWheel;
   static SettingsEntryEnum<std::string> modifierNumberScrollWheel;
 
+  static SettingsEntryString aiEndpoint;
+  static SettingsEntryString aiModel;
+  static SettingsEntryString aiSystemPrompt;
+
   static SettingsEntryString defaultPrintService;
   static SettingsEntryBool enableRemotePrintServices;
   static SettingsEntryBool printServiceAlwaysShowDialog;

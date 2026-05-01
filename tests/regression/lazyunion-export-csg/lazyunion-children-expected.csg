@@ -7,4 +7,3 @@ group() {
 		cylinder($fn = 0, $fa = 12, $fs = 2, h = 10, r1 = 5, r2 = 5, center = true);
 	}
 }
-

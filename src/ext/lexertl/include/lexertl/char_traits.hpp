@@ -9,37 +9,33 @@
 
 #include <cstdint>
 
-namespace lexertl
-{
-    template<typename ch_type>
-    struct basic_char_traits
-    {
-        using char_type = ch_type;
-        using index_type = ch_type;
+namespace lexertl {
+template <typename ch_type>
+struct basic_char_traits {
+  using char_type = ch_type;
+  using index_type = ch_type;
 
-        static index_type max_val()
-        {
-            const std::uint32_t max_ = 0x10ffff;
+  static index_type max_val()
+  {
+    const std::uint32_t max_ = 0x10ffff;
 
-            return sizeof(char_type) > 2 ?
-                max_ : (max_ & 0xffff);
-        }
-    };
+    return sizeof(char_type) > 2 ? max_ : (max_ & 0xffff);
+  }
+};
 
-    template<>
-    struct basic_char_traits<char>
-    {
-        using char_type = char;
-        using index_type = unsigned char;
+template <>
+struct basic_char_traits<char> {
+  using char_type = char;
+  using index_type = unsigned char;
 
-        static index_type max_val()
-        {
-            // Prevent annoying warning (VC++)
-            index_type zero_ = 0;
+  static index_type max_val()
+  {
+    // Prevent annoying warning (VC++)
+    index_type zero_ = 0;
 
-            return ~zero_;
-        }
-    };
-}
+    return ~zero_;
+  }
+};
+}  // namespace lexertl
 
 #endif

@@ -1,4 +1,4 @@
 {
-    "key" : "for",
-    "content" : "for (i = [ ^~^ :  ]) {\n\t\n}"
+  "key": "for",
+  "content": "for (i = [ ^~^ :  ]) {\n\t\n}"
 }

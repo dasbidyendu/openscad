@@ -1,12 +1,12 @@
-ECHO: 
-ECHO: 
+ECHO:
+ECHO:
 ECHO: "t2"
 ECHO: 18
 ECHO: c = 18
-ECHO: 
+ECHO:
 ECHO: c = 2
-ECHO: 
-ECHO: 
+ECHO:
+ECHO:
 ECHO: t0 = undef
 ECHO: t1 = undef
 ECHO: t2 = undef

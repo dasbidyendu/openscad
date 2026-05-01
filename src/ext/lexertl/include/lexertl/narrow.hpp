@@ -8,18 +8,16 @@
 
 #include <sstream>
 
-namespace lexertl
+namespace lexertl {
+template <typename char_type>
+void narrow(const char_type *str_, std::ostringstream& ss_)
 {
-    template<typename char_type>
-    void narrow(const char_type* str_, std::ostringstream& ss_)
-    {
-        while (*str_)
-        {
-            // Safe to simply cast to char.
-            // when string only contains ASCII.
-            ss_ << static_cast<char>(*str_++);
-        }
-    }
+  while (*str_) {
+    // Safe to simply cast to char.
+    // when string only contains ASCII.
+    ss_ << static_cast<char>(*str_++);
+  }
 }
+}  // namespace lexertl
 
 #endif

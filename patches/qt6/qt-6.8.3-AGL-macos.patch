@@ -4,7 +4,7 @@ diff -ru qt-everywhere-src-6.5.5/qtbase/cmake/FindWrapOpenGL.cmake qt-everywhere
 @@ -37,16 +37,7 @@
              set(__opengl_fw_path "-framework OpenGL")
          endif()
- 
+
 -        find_library(WrapOpenGL_AGL NAMES AGL)
 -        if(WrapOpenGL_AGL)
 -            set(__opengl_agl_fw_path "${WrapOpenGL_AGL}")

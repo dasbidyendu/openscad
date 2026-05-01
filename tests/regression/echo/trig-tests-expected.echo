@@ -16,7 +16,7 @@ ECHO: "sin(300) == -sqrt(3)/2 ", true
 ECHO: "sin(315) == -sqrt(2)/2 ", true
 ECHO: "sin(330) == -1/2       ", true
 ECHO: "sin(360) == 0          ", true
-ECHO: 
+ECHO:
 ECHO: "cos(  0) == 1          ", true
 ECHO: "cos( 30) == sqrt(3)/2  ", true
 ECHO: "cos( 45) == sqrt(2)/2  ", true
@@ -34,13 +34,13 @@ ECHO: "cos(300) == 1/2        ", true
 ECHO: "cos(315) == sqrt(2)/2  ", true
 ECHO: "cos(330) == sqrt(3)/2  ", true
 ECHO: "cos(360) == 1          ", true
-ECHO: 
+ECHO:
 ECHO: "// Quick test of signed zero checks"
 ECHO: " isNeg0(-0) ", true
 ECHO: "!isNeg0( 0) ", true
 ECHO: "!isPos0(-0) ", true
 ECHO: " isPos0( 0) ", true
-ECHO: 
+ECHO:
 ECHO: "isNeg0(tan(-180))      ", true
 ECHO: "tan(-150)== sqrt(3)/3  ", true
 ECHO: "tan(-135)== 1          ", true
@@ -58,17 +58,17 @@ ECHO: "tan(120) == -sqrt(3)   ", true
 ECHO: "tan(135) == -1         ", true
 ECHO: "tan(150) == -sqrt(3)/3 ", true
 ECHO: "isNeg0(tan(180))       ", true
-ECHO: 
+ECHO:
 ECHO: "***Verify functions are Odd/Even***"
 ECHO: "sin()  odd check PASSED"
 ECHO: "cos() even check PASSED"
 ECHO: "tan()  odd check PASSED"
-ECHO: 
+ECHO:
 ECHO: "***Verify functions are Periodic over a few cycles***"
 ECHO: "sin() periodic check PASSED"
 ECHO: "cos() periodic check PASSED"
 ECHO: "tan() periodic check PASSED"
-ECHO: 
+ECHO:
 ECHO: "***Verify Inverse Trigonometric functions***"
 ECHO: "asin() inverse check PASSED"
 ECHO: "acos() inverse check PASSED"

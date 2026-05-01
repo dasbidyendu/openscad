@@ -7,10 +7,9 @@
 #ifndef LEXERTL_OBSERVER_PTR_HPP
 #define LEXERTL_OBSERVER_PTR_HPP
 
-namespace lexertl
-{
-    template<typename T>
-    using observer_ptr = T*;
+namespace lexertl {
+template <typename T>
+using observer_ptr = T *;
 }
 
 #endif

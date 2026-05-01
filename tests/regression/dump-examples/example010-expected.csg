@@ -4,4 +4,3 @@ intersection() {
 		surface(file = "example010.dat", center = true, invert = false, timestamp = 1544039412);
 	}
 }
-

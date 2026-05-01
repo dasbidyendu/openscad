@@ -14,4 +14,3 @@ group() {
 		text(text = "fi fl fj ff", size = 50, spacing = 1, font = "Amiri:style=Regular:fontfeatures=-liga", direction = "ltr", language = "en", script = "Latn", halign = "default", valign = "default", $fn = 0, $fa = 12, $fs = 2);
 	}
 }
-

@@ -9,4 +9,3 @@ minkowski(convexity = 0) {
 		cube(size = [5, 5, 5], center = false);
 	}
 }
-

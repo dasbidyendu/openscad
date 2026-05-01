@@ -42,5 +42,3 @@ diff --color -ru lib3mf-2.4.1/CMakeLists.txt lib3mf-2.4.1-build/CMakeLists.txt
 +    target_link_libraries(${PROJECT_NAME} ${LIBZIP_LINK_LIBRARIES})
 +    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBZIP_INCLUDE_DIRS})
  endif()
-
-

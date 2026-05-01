@@ -19,7 +19,8 @@
  *  - ON_DEMAND = False
  *
  * Commandline:
- *    --merge --api='glx=1.4' --extensions='GLX_ARB_create_context,GLX_ARB_create_context_profile' c --alias --header-only --loader
+ *    --merge --api='glx=1.4' --extensions='GLX_ARB_create_context,GLX_ARB_create_context_profile' c
+ * --alias --header-only --loader
  *
  * Online:
  *    http://glad.sh/#api=glx%3D1.4&extensions=GLX_ARB_create_context%2CGLX_ARB_create_context_profile&generator=c&options=MERGE%2CALIAS%2CHEADER_ONLY%2CLOADER
@@ -30,10 +31,9 @@
 #define GLAD_GLX_H_
 
 #ifdef GLX_H
-  #error GLX header already included (API: glx), remove previous include!
+#error GLX header already included (API: glx), remove previous include!
 #endif
 #define GLX_H 1
-
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -53,92 +53,92 @@ extern "C" {
 #define GLAD_PLATFORM_H_
 
 #ifndef GLAD_PLATFORM_WIN32
-  #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__)
-    #define GLAD_PLATFORM_WIN32 1
-  #else
-    #define GLAD_PLATFORM_WIN32 0
-  #endif
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__)
+#define GLAD_PLATFORM_WIN32 1
+#else
+#define GLAD_PLATFORM_WIN32 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_APPLE
-  #ifdef __APPLE__
-    #define GLAD_PLATFORM_APPLE 1
-  #else
-    #define GLAD_PLATFORM_APPLE 0
-  #endif
+#ifdef __APPLE__
+#define GLAD_PLATFORM_APPLE 1
+#else
+#define GLAD_PLATFORM_APPLE 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_EMSCRIPTEN
-  #ifdef __EMSCRIPTEN__
-    #define GLAD_PLATFORM_EMSCRIPTEN 1
-  #else
-    #define GLAD_PLATFORM_EMSCRIPTEN 0
-  #endif
+#ifdef __EMSCRIPTEN__
+#define GLAD_PLATFORM_EMSCRIPTEN 1
+#else
+#define GLAD_PLATFORM_EMSCRIPTEN 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_UWP
-  #if defined(_MSC_VER) && !defined(GLAD_INTERNAL_HAVE_WINAPIFAMILY)
-    #ifdef __has_include
-      #if __has_include(<winapifamily.h>)
-        #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
-      #endif
-    #elif _MSC_VER >= 1700 && !_USING_V110_SDK71_
-      #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
-    #endif
-  #endif
+#if defined(_MSC_VER) && !defined(GLAD_INTERNAL_HAVE_WINAPIFAMILY)
+#ifdef __has_include
+#if __has_include(<winapifamily.h>)
+#define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
+#endif
+#elif _MSC_VER >= 1700 && !_USING_V110_SDK71_
+#define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
+#endif
+#endif
 
-  #ifdef GLAD_INTERNAL_HAVE_WINAPIFAMILY
-    #include <winapifamily.h>
-    #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
-      #define GLAD_PLATFORM_UWP 1
-    #endif
-  #endif
+#ifdef GLAD_INTERNAL_HAVE_WINAPIFAMILY
+#include <winapifamily.h>
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#define GLAD_PLATFORM_UWP 1
+#endif
+#endif
 
-  #ifndef GLAD_PLATFORM_UWP
-    #define GLAD_PLATFORM_UWP 0
-  #endif
+#ifndef GLAD_PLATFORM_UWP
+#define GLAD_PLATFORM_UWP 0
+#endif
 #endif
 
 #ifdef __GNUC__
-  #define GLAD_GNUC_EXTENSION __extension__
+#define GLAD_GNUC_EXTENSION __extension__
 #else
-  #define GLAD_GNUC_EXTENSION
+#define GLAD_GNUC_EXTENSION
 #endif
 
 #define GLAD_UNUSED(x) (void)(x)
 
 #ifndef GLAD_API_CALL
-  #if defined(GLAD_API_CALL_EXPORT)
-    #if GLAD_PLATFORM_WIN32 || defined(__CYGWIN__)
-      #if defined(GLAD_API_CALL_EXPORT_BUILD)
-        #if defined(__GNUC__)
-          #define GLAD_API_CALL __attribute__ ((dllexport)) extern
-        #else
-          #define GLAD_API_CALL __declspec(dllexport) extern
-        #endif
-      #else
-        #if defined(__GNUC__)
-          #define GLAD_API_CALL __attribute__ ((dllimport)) extern
-        #else
-          #define GLAD_API_CALL __declspec(dllimport) extern
-        #endif
-      #endif
-    #elif defined(__GNUC__) && defined(GLAD_API_CALL_EXPORT_BUILD)
-      #define GLAD_API_CALL __attribute__ ((visibility ("default"))) extern
-    #else
-      #define GLAD_API_CALL extern
-    #endif
-  #else
-    #define GLAD_API_CALL extern
-  #endif
+#if defined(GLAD_API_CALL_EXPORT)
+#if GLAD_PLATFORM_WIN32 || defined(__CYGWIN__)
+#if defined(GLAD_API_CALL_EXPORT_BUILD)
+#if defined(__GNUC__)
+#define GLAD_API_CALL __attribute__((dllexport)) extern
+#else
+#define GLAD_API_CALL __declspec(dllexport) extern
+#endif
+#else
+#if defined(__GNUC__)
+#define GLAD_API_CALL __attribute__((dllimport)) extern
+#else
+#define GLAD_API_CALL __declspec(dllimport) extern
+#endif
+#endif
+#elif defined(__GNUC__) && defined(GLAD_API_CALL_EXPORT_BUILD)
+#define GLAD_API_CALL __attribute__((visibility("default"))) extern
+#else
+#define GLAD_API_CALL extern
+#endif
+#else
+#define GLAD_API_CALL extern
+#endif
 #endif
 
 #ifdef APIENTRY
-  #define GLAD_API_PTR APIENTRY
+#define GLAD_API_PTR APIENTRY
 #elif GLAD_PLATFORM_WIN32
-  #define GLAD_API_PTR __stdcall
+#define GLAD_API_PTR __stdcall
 #else
-  #define GLAD_API_PTR
+#define GLAD_API_PTR
 #endif
 
 #ifndef GLAPI
@@ -263,7 +263,6 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define GLX_X_VISUAL_TYPE 0x22
 #define __GLX_NUMBER_EVENTS 17
 
-
 #ifndef GLEXT_64_TYPES_DEFINED
 /* This code block is duplicated in glext.h, so must be protected */
 #define GLEXT_64_TYPES_DEFINED
@@ -282,7 +281,7 @@ typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
 #endif /* __arch64__ */
 #endif /* __STDC__ */
-#elif defined( __VMS ) || defined(__sgi)
+#elif defined(__VMS) || defined(__sgi)
 #include <inttypes.h>
 #elif defined(__SCO__) || defined(__USLC__)
 #include <stdint.h>
@@ -302,39 +301,19 @@ typedef unsigned __int64 uint64_t;
 #endif
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 1060)
+#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && \
+  (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 1060)
 
 #else
 
 #endif
 
-#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 1060)
+#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && \
+  (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 1060)
 
 #else
 
 #endif
-
-
-
-
-
-
 
 typedef XID GLXFBConfigID;
 typedef struct __GLXFBConfigRec *GLXFBConfig;
@@ -344,7 +323,7 @@ typedef XID GLXPixmap;
 typedef XID GLXDrawable;
 typedef XID GLXWindow;
 typedef XID GLXPbuffer;
-typedef void (GLAD_API_PTR *__GLXextFuncPtr)(void);
+typedef void(GLAD_API_PTR *__GLXextFuncPtr)(void);
 typedef XID GLXVideoCaptureDeviceNV;
 typedef unsigned int GLXVideoDeviceNV;
 typedef XID GLXVideoSourceSGIX;
@@ -352,77 +331,76 @@ typedef XID GLXFBConfigIDSGIX;
 typedef struct __GLXFBConfigRec *GLXFBConfigSGIX;
 typedef XID GLXPbufferSGIX;
 typedef struct {
-    int event_type;             /* GLX_DAMAGED or GLX_SAVED */
-    int draw_type;              /* GLX_WINDOW or GLX_PBUFFER */
-    unsigned long serial;       /* # of last request processed by server */
-    Bool send_event;            /* true if this came for SendEvent request */
-    Display *display;           /* display the event was read from */
-    GLXDrawable drawable;       /* XID of Drawable */
-    unsigned int buffer_mask;   /* mask indicating which buffers are affected */
-    unsigned int aux_buffer;    /* which aux buffer was affected */
-    int x, y;
-    int width, height;
-    int count;                  /* if nonzero, at least this many more */
+  int event_type;           /* GLX_DAMAGED or GLX_SAVED */
+  int draw_type;            /* GLX_WINDOW or GLX_PBUFFER */
+  unsigned long serial;     /* # of last request processed by server */
+  Bool send_event;          /* true if this came for SendEvent request */
+  Display *display;         /* display the event was read from */
+  GLXDrawable drawable;     /* XID of Drawable */
+  unsigned int buffer_mask; /* mask indicating which buffers are affected */
+  unsigned int aux_buffer;  /* which aux buffer was affected */
+  int x, y;
+  int width, height;
+  int count; /* if nonzero, at least this many more */
 } GLXPbufferClobberEvent;
 typedef struct {
-    int type;
-    unsigned long serial;       /* # of last request processed by server */
-    Bool send_event;            /* true if this came from a SendEvent request */
-    Display *display;           /* Display the event was read from */
-    GLXDrawable drawable;       /* drawable on which event was requested in event mask */
-    int event_type;
-    int64_t ust;
-    int64_t msc;
-    int64_t sbc;
+  int type;
+  unsigned long serial; /* # of last request processed by server */
+  Bool send_event;      /* true if this came from a SendEvent request */
+  Display *display;     /* Display the event was read from */
+  GLXDrawable drawable; /* drawable on which event was requested in event mask */
+  int event_type;
+  int64_t ust;
+  int64_t msc;
+  int64_t sbc;
 } GLXBufferSwapComplete;
 typedef union __GLXEvent {
-    GLXPbufferClobberEvent glxpbufferclobber;
-    GLXBufferSwapComplete glxbufferswapcomplete;
-    long pad[24];
+  GLXPbufferClobberEvent glxpbufferclobber;
+  GLXBufferSwapComplete glxbufferswapcomplete;
+  long pad[24];
 } GLXEvent;
 typedef struct {
-    int type;
-    unsigned long serial;
-    Bool send_event;
-    Display *display;
-    int extension;
-    int evtype;
-    GLXDrawable window;
-    Bool stereo_tree;
+  int type;
+  unsigned long serial;
+  Bool send_event;
+  Display *display;
+  int extension;
+  int evtype;
+  GLXDrawable window;
+  Bool stereo_tree;
 } GLXStereoNotifyEventEXT;
 typedef struct {
-    int type;
-    unsigned long serial;   /* # of last request processed by server */
-    Bool send_event;        /* true if this came for SendEvent request */
-    Display *display;       /* display the event was read from */
-    GLXDrawable drawable;   /* i.d. of Drawable */
-    int event_type;         /* GLX_DAMAGED_SGIX or GLX_SAVED_SGIX */
-    int draw_type;          /* GLX_WINDOW_SGIX or GLX_PBUFFER_SGIX */
-    unsigned int mask;      /* mask indicating which buffers are affected*/
-    int x, y;
-    int width, height;
-    int count;              /* if nonzero, at least this many more */
+  int type;
+  unsigned long serial; /* # of last request processed by server */
+  Bool send_event;      /* true if this came for SendEvent request */
+  Display *display;     /* display the event was read from */
+  GLXDrawable drawable; /* i.d. of Drawable */
+  int event_type;       /* GLX_DAMAGED_SGIX or GLX_SAVED_SGIX */
+  int draw_type;        /* GLX_WINDOW_SGIX or GLX_PBUFFER_SGIX */
+  unsigned int mask;    /* mask indicating which buffers are affected*/
+  int x, y;
+  int width, height;
+  int count; /* if nonzero, at least this many more */
 } GLXBufferClobberEventSGIX;
 typedef struct {
-    char    pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
-    int     networkId;
+  char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
+  int networkId;
 } GLXHyperpipeNetworkSGIX;
 typedef struct {
-    char    pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
-    int     channel;
-    unsigned int participationType;
-    int     timeSlice;
+  char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
+  int channel;
+  unsigned int participationType;
+  int timeSlice;
 } GLXHyperpipeConfigSGIX;
 typedef struct {
-    char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
-    int srcXOrigin, srcYOrigin, srcWidth, srcHeight;
-    int destXOrigin, destYOrigin, destWidth, destHeight;
+  char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
+  int srcXOrigin, srcYOrigin, srcWidth, srcHeight;
+  int destXOrigin, destYOrigin, destWidth, destHeight;
 } GLXPipeRect;
 typedef struct {
-    char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
-    int XOrigin, YOrigin, maxHeight, maxWidth;
+  char pipeName[80]; /* Should be [GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX] */
+  int XOrigin, YOrigin, maxHeight, maxWidth;
 } GLXPipeRectLimits;
-
 
 #define GLX_VERSION_1_0 1
 GLAD_API_CALL int GLAD_GLX_VERSION_1_0;
@@ -439,47 +417,64 @@ GLAD_API_CALL int GLAD_GLX_ARB_create_context;
 #define GLX_ARB_create_context_profile 1
 GLAD_API_CALL int GLAD_GLX_ARB_create_context_profile;
 
-
-typedef GLXFBConfig * (GLAD_API_PTR *PFNGLXCHOOSEFBCONFIGPROC)(Display * dpy, int screen, const int * attrib_list, int * nelements);
-typedef XVisualInfo * (GLAD_API_PTR *PFNGLXCHOOSEVISUALPROC)(Display * dpy, int screen, int * attribList);
-typedef void (GLAD_API_PTR *PFNGLXCOPYCONTEXTPROC)(Display * dpy, GLXContext src, GLXContext dst, unsigned long mask);
-typedef GLXContext (GLAD_API_PTR *PFNGLXCREATECONTEXTPROC)(Display * dpy, XVisualInfo * vis, GLXContext shareList, Bool direct);
-typedef GLXContext (GLAD_API_PTR *PFNGLXCREATECONTEXTATTRIBSARBPROC)(Display * dpy, GLXFBConfig config, GLXContext share_context, Bool direct, const int * attrib_list);
-typedef GLXPixmap (GLAD_API_PTR *PFNGLXCREATEGLXPIXMAPPROC)(Display * dpy, XVisualInfo * visual, Pixmap pixmap);
-typedef GLXContext (GLAD_API_PTR *PFNGLXCREATENEWCONTEXTPROC)(Display * dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
-typedef GLXPbuffer (GLAD_API_PTR *PFNGLXCREATEPBUFFERPROC)(Display * dpy, GLXFBConfig config, const int * attrib_list);
-typedef GLXPixmap (GLAD_API_PTR *PFNGLXCREATEPIXMAPPROC)(Display * dpy, GLXFBConfig config, Pixmap pixmap, const int * attrib_list);
-typedef GLXWindow (GLAD_API_PTR *PFNGLXCREATEWINDOWPROC)(Display * dpy, GLXFBConfig config, Window win, const int * attrib_list);
-typedef void (GLAD_API_PTR *PFNGLXDESTROYCONTEXTPROC)(Display * dpy, GLXContext ctx);
-typedef void (GLAD_API_PTR *PFNGLXDESTROYGLXPIXMAPPROC)(Display * dpy, GLXPixmap pixmap);
-typedef void (GLAD_API_PTR *PFNGLXDESTROYPBUFFERPROC)(Display * dpy, GLXPbuffer pbuf);
-typedef void (GLAD_API_PTR *PFNGLXDESTROYPIXMAPPROC)(Display * dpy, GLXPixmap pixmap);
-typedef void (GLAD_API_PTR *PFNGLXDESTROYWINDOWPROC)(Display * dpy, GLXWindow win);
-typedef const char * (GLAD_API_PTR *PFNGLXGETCLIENTSTRINGPROC)(Display * dpy, int name);
-typedef int (GLAD_API_PTR *PFNGLXGETCONFIGPROC)(Display * dpy, XVisualInfo * visual, int attrib, int * value);
-typedef GLXContext (GLAD_API_PTR *PFNGLXGETCURRENTCONTEXTPROC)(void);
-typedef Display * (GLAD_API_PTR *PFNGLXGETCURRENTDISPLAYPROC)(void);
-typedef GLXDrawable (GLAD_API_PTR *PFNGLXGETCURRENTDRAWABLEPROC)(void);
-typedef GLXDrawable (GLAD_API_PTR *PFNGLXGETCURRENTREADDRAWABLEPROC)(void);
-typedef int (GLAD_API_PTR *PFNGLXGETFBCONFIGATTRIBPROC)(Display * dpy, GLXFBConfig config, int attribute, int * value);
-typedef GLXFBConfig * (GLAD_API_PTR *PFNGLXGETFBCONFIGSPROC)(Display * dpy, int screen, int * nelements);
-typedef __GLXextFuncPtr (GLAD_API_PTR *PFNGLXGETPROCADDRESSPROC)(const GLubyte * procName);
-typedef void (GLAD_API_PTR *PFNGLXGETSELECTEDEVENTPROC)(Display * dpy, GLXDrawable draw, unsigned long * event_mask);
-typedef XVisualInfo * (GLAD_API_PTR *PFNGLXGETVISUALFROMFBCONFIGPROC)(Display * dpy, GLXFBConfig config);
-typedef Bool (GLAD_API_PTR *PFNGLXISDIRECTPROC)(Display * dpy, GLXContext ctx);
-typedef Bool (GLAD_API_PTR *PFNGLXMAKECONTEXTCURRENTPROC)(Display * dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-typedef Bool (GLAD_API_PTR *PFNGLXMAKECURRENTPROC)(Display * dpy, GLXDrawable drawable, GLXContext ctx);
-typedef int (GLAD_API_PTR *PFNGLXQUERYCONTEXTPROC)(Display * dpy, GLXContext ctx, int attribute, int * value);
-typedef void (GLAD_API_PTR *PFNGLXQUERYDRAWABLEPROC)(Display * dpy, GLXDrawable draw, int attribute, unsigned int * value);
-typedef Bool (GLAD_API_PTR *PFNGLXQUERYEXTENSIONPROC)(Display * dpy, int * errorb, int * event);
-typedef const char * (GLAD_API_PTR *PFNGLXQUERYEXTENSIONSSTRINGPROC)(Display * dpy, int screen);
-typedef const char * (GLAD_API_PTR *PFNGLXQUERYSERVERSTRINGPROC)(Display * dpy, int screen, int name);
-typedef Bool (GLAD_API_PTR *PFNGLXQUERYVERSIONPROC)(Display * dpy, int * maj, int * min);
-typedef void (GLAD_API_PTR *PFNGLXSELECTEVENTPROC)(Display * dpy, GLXDrawable draw, unsigned long event_mask);
-typedef void (GLAD_API_PTR *PFNGLXSWAPBUFFERSPROC)(Display * dpy, GLXDrawable drawable);
-typedef void (GLAD_API_PTR *PFNGLXUSEXFONTPROC)(Font font, int first, int count, int list);
-typedef void (GLAD_API_PTR *PFNGLXWAITGLPROC)(void);
-typedef void (GLAD_API_PTR *PFNGLXWAITXPROC)(void);
+typedef GLXFBConfig *(GLAD_API_PTR *PFNGLXCHOOSEFBCONFIGPROC)(Display *dpy, int screen,
+                                                              const int *attrib_list, int *nelements);
+typedef XVisualInfo *(GLAD_API_PTR *PFNGLXCHOOSEVISUALPROC)(Display *dpy, int screen, int *attribList);
+typedef void(GLAD_API_PTR *PFNGLXCOPYCONTEXTPROC)(Display *dpy, GLXContext src, GLXContext dst,
+                                                  unsigned long mask);
+typedef GLXContext(GLAD_API_PTR *PFNGLXCREATECONTEXTPROC)(Display *dpy, XVisualInfo *vis,
+                                                          GLXContext shareList, Bool direct);
+typedef GLXContext(GLAD_API_PTR *PFNGLXCREATECONTEXTATTRIBSARBPROC)(Display *dpy, GLXFBConfig config,
+                                                                    GLXContext share_context,
+                                                                    Bool direct, const int *attrib_list);
+typedef GLXPixmap(GLAD_API_PTR *PFNGLXCREATEGLXPIXMAPPROC)(Display *dpy, XVisualInfo *visual,
+                                                           Pixmap pixmap);
+typedef GLXContext(GLAD_API_PTR *PFNGLXCREATENEWCONTEXTPROC)(Display *dpy, GLXFBConfig config,
+                                                             int render_type, GLXContext share_list,
+                                                             Bool direct);
+typedef GLXPbuffer(GLAD_API_PTR *PFNGLXCREATEPBUFFERPROC)(Display *dpy, GLXFBConfig config,
+                                                          const int *attrib_list);
+typedef GLXPixmap(GLAD_API_PTR *PFNGLXCREATEPIXMAPPROC)(Display *dpy, GLXFBConfig config, Pixmap pixmap,
+                                                        const int *attrib_list);
+typedef GLXWindow(GLAD_API_PTR *PFNGLXCREATEWINDOWPROC)(Display *dpy, GLXFBConfig config, Window win,
+                                                        const int *attrib_list);
+typedef void(GLAD_API_PTR *PFNGLXDESTROYCONTEXTPROC)(Display *dpy, GLXContext ctx);
+typedef void(GLAD_API_PTR *PFNGLXDESTROYGLXPIXMAPPROC)(Display *dpy, GLXPixmap pixmap);
+typedef void(GLAD_API_PTR *PFNGLXDESTROYPBUFFERPROC)(Display *dpy, GLXPbuffer pbuf);
+typedef void(GLAD_API_PTR *PFNGLXDESTROYPIXMAPPROC)(Display *dpy, GLXPixmap pixmap);
+typedef void(GLAD_API_PTR *PFNGLXDESTROYWINDOWPROC)(Display *dpy, GLXWindow win);
+typedef const char *(GLAD_API_PTR *PFNGLXGETCLIENTSTRINGPROC)(Display *dpy, int name);
+typedef int(GLAD_API_PTR *PFNGLXGETCONFIGPROC)(Display *dpy, XVisualInfo *visual, int attrib,
+                                               int *value);
+typedef GLXContext(GLAD_API_PTR *PFNGLXGETCURRENTCONTEXTPROC)(void);
+typedef Display *(GLAD_API_PTR *PFNGLXGETCURRENTDISPLAYPROC)(void);
+typedef GLXDrawable(GLAD_API_PTR *PFNGLXGETCURRENTDRAWABLEPROC)(void);
+typedef GLXDrawable(GLAD_API_PTR *PFNGLXGETCURRENTREADDRAWABLEPROC)(void);
+typedef int(GLAD_API_PTR *PFNGLXGETFBCONFIGATTRIBPROC)(Display *dpy, GLXFBConfig config, int attribute,
+                                                       int *value);
+typedef GLXFBConfig *(GLAD_API_PTR *PFNGLXGETFBCONFIGSPROC)(Display *dpy, int screen, int *nelements);
+typedef __GLXextFuncPtr(GLAD_API_PTR *PFNGLXGETPROCADDRESSPROC)(const GLubyte *procName);
+typedef void(GLAD_API_PTR *PFNGLXGETSELECTEDEVENTPROC)(Display *dpy, GLXDrawable draw,
+                                                       unsigned long *event_mask);
+typedef XVisualInfo *(GLAD_API_PTR *PFNGLXGETVISUALFROMFBCONFIGPROC)(Display *dpy, GLXFBConfig config);
+typedef Bool(GLAD_API_PTR *PFNGLXISDIRECTPROC)(Display *dpy, GLXContext ctx);
+typedef Bool(GLAD_API_PTR *PFNGLXMAKECONTEXTCURRENTPROC)(Display *dpy, GLXDrawable draw,
+                                                         GLXDrawable read, GLXContext ctx);
+typedef Bool(GLAD_API_PTR *PFNGLXMAKECURRENTPROC)(Display *dpy, GLXDrawable drawable, GLXContext ctx);
+typedef int(GLAD_API_PTR *PFNGLXQUERYCONTEXTPROC)(Display *dpy, GLXContext ctx, int attribute,
+                                                  int *value);
+typedef void(GLAD_API_PTR *PFNGLXQUERYDRAWABLEPROC)(Display *dpy, GLXDrawable draw, int attribute,
+                                                    unsigned int *value);
+typedef Bool(GLAD_API_PTR *PFNGLXQUERYEXTENSIONPROC)(Display *dpy, int *errorb, int *event);
+typedef const char *(GLAD_API_PTR *PFNGLXQUERYEXTENSIONSSTRINGPROC)(Display *dpy, int screen);
+typedef const char *(GLAD_API_PTR *PFNGLXQUERYSERVERSTRINGPROC)(Display *dpy, int screen, int name);
+typedef Bool(GLAD_API_PTR *PFNGLXQUERYVERSIONPROC)(Display *dpy, int *maj, int *min);
+typedef void(GLAD_API_PTR *PFNGLXSELECTEVENTPROC)(Display *dpy, GLXDrawable draw,
+                                                  unsigned long event_mask);
+typedef void(GLAD_API_PTR *PFNGLXSWAPBUFFERSPROC)(Display *dpy, GLXDrawable drawable);
+typedef void(GLAD_API_PTR *PFNGLXUSEXFONTPROC)(Font font, int first, int count, int list);
+typedef void(GLAD_API_PTR *PFNGLXWAITGLPROC)(void);
+typedef void(GLAD_API_PTR *PFNGLXWAITXPROC)(void);
 
 GLAD_API_CALL PFNGLXCHOOSEFBCONFIGPROC glad_glXChooseFBConfig;
 #define glXChooseFBConfig glad_glXChooseFBConfig
@@ -562,11 +557,8 @@ GLAD_API_CALL PFNGLXWAITGLPROC glad_glXWaitGL;
 GLAD_API_CALL PFNGLXWAITXPROC glad_glXWaitX;
 #define glXWaitX glad_glXWaitX
 
-
-
-
-
-GLAD_API_CALL int gladLoadGLXUserPtr(Display *display, int screen, GLADuserptrloadfunc load, void *userptr);
+GLAD_API_CALL int gladLoadGLXUserPtr(Display *display, int screen, GLADuserptrloadfunc load,
+                                     void *userptr);
 GLAD_API_CALL int gladLoadGLX(Display *display, int screen, GLADloadfunc load);
 
 #ifdef GLAD_GLX
@@ -605,8 +597,6 @@ GLAD_API_CALL void gladLoaderUnloadGLX(void);
 extern "C" {
 #endif
 
-
-
 int GLAD_GLX_VERSION_1_0 = 0;
 int GLAD_GLX_VERSION_1_1 = 0;
 int GLAD_GLX_VERSION_1_2 = 0;
@@ -614,8 +604,6 @@ int GLAD_GLX_VERSION_1_3 = 0;
 int GLAD_GLX_VERSION_1_4 = 0;
 int GLAD_GLX_ARB_create_context = 0;
 int GLAD_GLX_ARB_create_context_profile = 0;
-
-
 
 PFNGLXCHOOSEFBCONFIGPROC glad_glXChooseFBConfig = NULL;
 PFNGLXCHOOSEVISUALPROC glad_glXChooseVisual = NULL;
@@ -658,165 +646,178 @@ PFNGLXUSEXFONTPROC glad_glXUseXFont = NULL;
 PFNGLXWAITGLPROC glad_glXWaitGL = NULL;
 PFNGLXWAITXPROC glad_glXWaitX = NULL;
 
+static void glad_glx_load_GLX_VERSION_1_0(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_VERSION_1_0) return;
+  glad_glXChooseVisual = (PFNGLXCHOOSEVISUALPROC)load(userptr, "glXChooseVisual");
+  glad_glXCopyContext = (PFNGLXCOPYCONTEXTPROC)load(userptr, "glXCopyContext");
+  glad_glXCreateContext = (PFNGLXCREATECONTEXTPROC)load(userptr, "glXCreateContext");
+  glad_glXCreateGLXPixmap = (PFNGLXCREATEGLXPIXMAPPROC)load(userptr, "glXCreateGLXPixmap");
+  glad_glXDestroyContext = (PFNGLXDESTROYCONTEXTPROC)load(userptr, "glXDestroyContext");
+  glad_glXDestroyGLXPixmap = (PFNGLXDESTROYGLXPIXMAPPROC)load(userptr, "glXDestroyGLXPixmap");
+  glad_glXGetConfig = (PFNGLXGETCONFIGPROC)load(userptr, "glXGetConfig");
+  glad_glXGetCurrentContext = (PFNGLXGETCURRENTCONTEXTPROC)load(userptr, "glXGetCurrentContext");
+  glad_glXGetCurrentDrawable = (PFNGLXGETCURRENTDRAWABLEPROC)load(userptr, "glXGetCurrentDrawable");
+  glad_glXIsDirect = (PFNGLXISDIRECTPROC)load(userptr, "glXIsDirect");
+  glad_glXMakeCurrent = (PFNGLXMAKECURRENTPROC)load(userptr, "glXMakeCurrent");
+  glad_glXQueryExtension = (PFNGLXQUERYEXTENSIONPROC)load(userptr, "glXQueryExtension");
+  glad_glXQueryVersion = (PFNGLXQUERYVERSIONPROC)load(userptr, "glXQueryVersion");
+  glad_glXSwapBuffers = (PFNGLXSWAPBUFFERSPROC)load(userptr, "glXSwapBuffers");
+  glad_glXUseXFont = (PFNGLXUSEXFONTPROC)load(userptr, "glXUseXFont");
+  glad_glXWaitGL = (PFNGLXWAITGLPROC)load(userptr, "glXWaitGL");
+  glad_glXWaitX = (PFNGLXWAITXPROC)load(userptr, "glXWaitX");
+}
+static void glad_glx_load_GLX_VERSION_1_1(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_VERSION_1_1) return;
+  glad_glXGetClientString = (PFNGLXGETCLIENTSTRINGPROC)load(userptr, "glXGetClientString");
+  glad_glXQueryExtensionsString =
+    (PFNGLXQUERYEXTENSIONSSTRINGPROC)load(userptr, "glXQueryExtensionsString");
+  glad_glXQueryServerString = (PFNGLXQUERYSERVERSTRINGPROC)load(userptr, "glXQueryServerString");
+}
+static void glad_glx_load_GLX_VERSION_1_2(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_VERSION_1_2) return;
+  glad_glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)load(userptr, "glXGetCurrentDisplay");
+}
+static void glad_glx_load_GLX_VERSION_1_3(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_VERSION_1_3) return;
+  glad_glXChooseFBConfig = (PFNGLXCHOOSEFBCONFIGPROC)load(userptr, "glXChooseFBConfig");
+  glad_glXCreateNewContext = (PFNGLXCREATENEWCONTEXTPROC)load(userptr, "glXCreateNewContext");
+  glad_glXCreatePbuffer = (PFNGLXCREATEPBUFFERPROC)load(userptr, "glXCreatePbuffer");
+  glad_glXCreatePixmap = (PFNGLXCREATEPIXMAPPROC)load(userptr, "glXCreatePixmap");
+  glad_glXCreateWindow = (PFNGLXCREATEWINDOWPROC)load(userptr, "glXCreateWindow");
+  glad_glXDestroyPbuffer = (PFNGLXDESTROYPBUFFERPROC)load(userptr, "glXDestroyPbuffer");
+  glad_glXDestroyPixmap = (PFNGLXDESTROYPIXMAPPROC)load(userptr, "glXDestroyPixmap");
+  glad_glXDestroyWindow = (PFNGLXDESTROYWINDOWPROC)load(userptr, "glXDestroyWindow");
+  glad_glXGetCurrentReadDrawable =
+    (PFNGLXGETCURRENTREADDRAWABLEPROC)load(userptr, "glXGetCurrentReadDrawable");
+  glad_glXGetFBConfigAttrib = (PFNGLXGETFBCONFIGATTRIBPROC)load(userptr, "glXGetFBConfigAttrib");
+  glad_glXGetFBConfigs = (PFNGLXGETFBCONFIGSPROC)load(userptr, "glXGetFBConfigs");
+  glad_glXGetSelectedEvent = (PFNGLXGETSELECTEDEVENTPROC)load(userptr, "glXGetSelectedEvent");
+  glad_glXGetVisualFromFBConfig =
+    (PFNGLXGETVISUALFROMFBCONFIGPROC)load(userptr, "glXGetVisualFromFBConfig");
+  glad_glXMakeContextCurrent = (PFNGLXMAKECONTEXTCURRENTPROC)load(userptr, "glXMakeContextCurrent");
+  glad_glXQueryContext = (PFNGLXQUERYCONTEXTPROC)load(userptr, "glXQueryContext");
+  glad_glXQueryDrawable = (PFNGLXQUERYDRAWABLEPROC)load(userptr, "glXQueryDrawable");
+  glad_glXSelectEvent = (PFNGLXSELECTEVENTPROC)load(userptr, "glXSelectEvent");
+}
+static void glad_glx_load_GLX_VERSION_1_4(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_VERSION_1_4) return;
+  glad_glXGetProcAddress = (PFNGLXGETPROCADDRESSPROC)load(userptr, "glXGetProcAddress");
+}
+static void glad_glx_load_GLX_ARB_create_context(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_GLX_ARB_create_context) return;
+  glad_glXCreateContextAttribsARB =
+    (PFNGLXCREATECONTEXTATTRIBSARBPROC)load(userptr, "glXCreateContextAttribsARB");
+}
 
-static void glad_glx_load_GLX_VERSION_1_0( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_VERSION_1_0) return;
-    glad_glXChooseVisual = (PFNGLXCHOOSEVISUALPROC) load(userptr, "glXChooseVisual");
-    glad_glXCopyContext = (PFNGLXCOPYCONTEXTPROC) load(userptr, "glXCopyContext");
-    glad_glXCreateContext = (PFNGLXCREATECONTEXTPROC) load(userptr, "glXCreateContext");
-    glad_glXCreateGLXPixmap = (PFNGLXCREATEGLXPIXMAPPROC) load(userptr, "glXCreateGLXPixmap");
-    glad_glXDestroyContext = (PFNGLXDESTROYCONTEXTPROC) load(userptr, "glXDestroyContext");
-    glad_glXDestroyGLXPixmap = (PFNGLXDESTROYGLXPIXMAPPROC) load(userptr, "glXDestroyGLXPixmap");
-    glad_glXGetConfig = (PFNGLXGETCONFIGPROC) load(userptr, "glXGetConfig");
-    glad_glXGetCurrentContext = (PFNGLXGETCURRENTCONTEXTPROC) load(userptr, "glXGetCurrentContext");
-    glad_glXGetCurrentDrawable = (PFNGLXGETCURRENTDRAWABLEPROC) load(userptr, "glXGetCurrentDrawable");
-    glad_glXIsDirect = (PFNGLXISDIRECTPROC) load(userptr, "glXIsDirect");
-    glad_glXMakeCurrent = (PFNGLXMAKECURRENTPROC) load(userptr, "glXMakeCurrent");
-    glad_glXQueryExtension = (PFNGLXQUERYEXTENSIONPROC) load(userptr, "glXQueryExtension");
-    glad_glXQueryVersion = (PFNGLXQUERYVERSIONPROC) load(userptr, "glXQueryVersion");
-    glad_glXSwapBuffers = (PFNGLXSWAPBUFFERSPROC) load(userptr, "glXSwapBuffers");
-    glad_glXUseXFont = (PFNGLXUSEXFONTPROC) load(userptr, "glXUseXFont");
-    glad_glXWaitGL = (PFNGLXWAITGLPROC) load(userptr, "glXWaitGL");
-    glad_glXWaitX = (PFNGLXWAITXPROC) load(userptr, "glXWaitX");
-}
-static void glad_glx_load_GLX_VERSION_1_1( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_VERSION_1_1) return;
-    glad_glXGetClientString = (PFNGLXGETCLIENTSTRINGPROC) load(userptr, "glXGetClientString");
-    glad_glXQueryExtensionsString = (PFNGLXQUERYEXTENSIONSSTRINGPROC) load(userptr, "glXQueryExtensionsString");
-    glad_glXQueryServerString = (PFNGLXQUERYSERVERSTRINGPROC) load(userptr, "glXQueryServerString");
-}
-static void glad_glx_load_GLX_VERSION_1_2( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_VERSION_1_2) return;
-    glad_glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC) load(userptr, "glXGetCurrentDisplay");
-}
-static void glad_glx_load_GLX_VERSION_1_3( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_VERSION_1_3) return;
-    glad_glXChooseFBConfig = (PFNGLXCHOOSEFBCONFIGPROC) load(userptr, "glXChooseFBConfig");
-    glad_glXCreateNewContext = (PFNGLXCREATENEWCONTEXTPROC) load(userptr, "glXCreateNewContext");
-    glad_glXCreatePbuffer = (PFNGLXCREATEPBUFFERPROC) load(userptr, "glXCreatePbuffer");
-    glad_glXCreatePixmap = (PFNGLXCREATEPIXMAPPROC) load(userptr, "glXCreatePixmap");
-    glad_glXCreateWindow = (PFNGLXCREATEWINDOWPROC) load(userptr, "glXCreateWindow");
-    glad_glXDestroyPbuffer = (PFNGLXDESTROYPBUFFERPROC) load(userptr, "glXDestroyPbuffer");
-    glad_glXDestroyPixmap = (PFNGLXDESTROYPIXMAPPROC) load(userptr, "glXDestroyPixmap");
-    glad_glXDestroyWindow = (PFNGLXDESTROYWINDOWPROC) load(userptr, "glXDestroyWindow");
-    glad_glXGetCurrentReadDrawable = (PFNGLXGETCURRENTREADDRAWABLEPROC) load(userptr, "glXGetCurrentReadDrawable");
-    glad_glXGetFBConfigAttrib = (PFNGLXGETFBCONFIGATTRIBPROC) load(userptr, "glXGetFBConfigAttrib");
-    glad_glXGetFBConfigs = (PFNGLXGETFBCONFIGSPROC) load(userptr, "glXGetFBConfigs");
-    glad_glXGetSelectedEvent = (PFNGLXGETSELECTEDEVENTPROC) load(userptr, "glXGetSelectedEvent");
-    glad_glXGetVisualFromFBConfig = (PFNGLXGETVISUALFROMFBCONFIGPROC) load(userptr, "glXGetVisualFromFBConfig");
-    glad_glXMakeContextCurrent = (PFNGLXMAKECONTEXTCURRENTPROC) load(userptr, "glXMakeContextCurrent");
-    glad_glXQueryContext = (PFNGLXQUERYCONTEXTPROC) load(userptr, "glXQueryContext");
-    glad_glXQueryDrawable = (PFNGLXQUERYDRAWABLEPROC) load(userptr, "glXQueryDrawable");
-    glad_glXSelectEvent = (PFNGLXSELECTEVENTPROC) load(userptr, "glXSelectEvent");
-}
-static void glad_glx_load_GLX_VERSION_1_4( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_VERSION_1_4) return;
-    glad_glXGetProcAddress = (PFNGLXGETPROCADDRESSPROC) load(userptr, "glXGetProcAddress");
-}
-static void glad_glx_load_GLX_ARB_create_context( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GLX_ARB_create_context) return;
-    glad_glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC) load(userptr, "glXCreateContextAttribsARB");
+static void glad_glx_resolve_aliases(void)
+{
 }
 
-
-static void glad_glx_resolve_aliases(void) {
-}
-
-static int glad_glx_has_extension(Display *display, int screen, const char *ext) {
+static int glad_glx_has_extension(Display *display, int screen, const char *ext)
+{
 #ifndef GLX_VERSION_1_1
-    GLAD_UNUSED(display);
-    GLAD_UNUSED(screen);
-    GLAD_UNUSED(ext);
+  GLAD_UNUSED(display);
+  GLAD_UNUSED(screen);
+  GLAD_UNUSED(ext);
 #else
-    const char *terminator;
-    const char *loc;
-    const char *extensions;
+  const char *terminator;
+  const char *loc;
+  const char *extensions;
 
-    if (glXQueryExtensionsString == NULL) {
-        return 0;
-    }
-
-    extensions = glXQueryExtensionsString(display, screen);
-
-    if(extensions == NULL || ext == NULL) {
-        return 0;
-    }
-
-    while(1) {
-        loc = strstr(extensions, ext);
-        if(loc == NULL)
-            break;
-
-        terminator = loc + strlen(ext);
-        if((loc == extensions || *(loc - 1) == ' ') &&
-            (*terminator == ' ' || *terminator == '\0')) {
-            return 1;
-        }
-        extensions = terminator;
-    }
-#endif
-
+  if (glXQueryExtensionsString == NULL) {
     return 0;
-}
+  }
 
-static GLADapiproc glad_glx_get_proc_from_userptr(void *userptr, const char* name) {
-    return (GLAD_GNUC_EXTENSION (GLADapiproc (*)(const char *name)) userptr)(name);
-}
+  extensions = glXQueryExtensionsString(display, screen);
 
-static int glad_glx_find_extensions(Display *display, int screen) {
-    GLAD_GLX_ARB_create_context = glad_glx_has_extension(display, screen, "GLX_ARB_create_context");
-    GLAD_GLX_ARB_create_context_profile = glad_glx_has_extension(display, screen, "GLX_ARB_create_context_profile");
-    return 1;
-}
+  if (extensions == NULL || ext == NULL) {
+    return 0;
+  }
 
-static int glad_glx_find_core_glx(Display **display, int *screen) {
-    int major = 0, minor = 0;
-    if(*display == NULL) {
-#ifdef GLAD_GLX_NO_X11
-        GLAD_UNUSED(screen);
-        return 0;
-#else
-        *display = XOpenDisplay(0);
-        if (*display == NULL) {
-            return 0;
-        }
-        *screen = XScreenNumberOfScreen(XDefaultScreenOfDisplay(*display));
-#endif
+  while (1) {
+    loc = strstr(extensions, ext);
+    if (loc == NULL) break;
+
+    terminator = loc + strlen(ext);
+    if ((loc == extensions || *(loc - 1) == ' ') && (*terminator == ' ' || *terminator == '\0')) {
+      return 1;
     }
-    glXQueryVersion(*display, &major, &minor);
-    GLAD_GLX_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
-    GLAD_GLX_VERSION_1_1 = (major == 1 && minor >= 1) || major > 1;
-    GLAD_GLX_VERSION_1_2 = (major == 1 && minor >= 2) || major > 1;
-    GLAD_GLX_VERSION_1_3 = (major == 1 && minor >= 3) || major > 1;
-    GLAD_GLX_VERSION_1_4 = (major == 1 && minor >= 4) || major > 1;
-    return GLAD_MAKE_VERSION(major, minor);
+    extensions = terminator;
+  }
+#endif
+
+  return 0;
 }
 
-int gladLoadGLXUserPtr(Display *display, int screen, GLADuserptrloadfunc load, void *userptr) {
-    int version;
-    glXQueryVersion = (PFNGLXQUERYVERSIONPROC) load(userptr, "glXQueryVersion");
-    if(glXQueryVersion == NULL) return 0;
-    version = glad_glx_find_core_glx(&display, &screen);
-
-    glad_glx_load_GLX_VERSION_1_0(load, userptr);
-    glad_glx_load_GLX_VERSION_1_1(load, userptr);
-    glad_glx_load_GLX_VERSION_1_2(load, userptr);
-    glad_glx_load_GLX_VERSION_1_3(load, userptr);
-    glad_glx_load_GLX_VERSION_1_4(load, userptr);
-
-    if (!glad_glx_find_extensions(display, screen)) return 0;
-    glad_glx_load_GLX_ARB_create_context(load, userptr);
-
-    glad_glx_resolve_aliases();
-
-    return version;
+static GLADapiproc glad_glx_get_proc_from_userptr(void *userptr, const char *name)
+{
+  return (GLAD_GNUC_EXTENSION(GLADapiproc (*)(const char *name)) userptr)(name);
 }
 
-int gladLoadGLX(Display *display, int screen, GLADloadfunc load) {
-    return gladLoadGLXUserPtr(display, screen, glad_glx_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
+static int glad_glx_find_extensions(Display *display, int screen)
+{
+  GLAD_GLX_ARB_create_context = glad_glx_has_extension(display, screen, "GLX_ARB_create_context");
+  GLAD_GLX_ARB_create_context_profile =
+    glad_glx_has_extension(display, screen, "GLX_ARB_create_context_profile");
+  return 1;
 }
 
- 
+static int glad_glx_find_core_glx(Display **display, int *screen)
+{
+  int major = 0, minor = 0;
+  if (*display == NULL) {
+#ifdef GLAD_GLX_NO_X11
+    GLAD_UNUSED(screen);
+    return 0;
+#else
+    *display = XOpenDisplay(0);
+    if (*display == NULL) {
+      return 0;
+    }
+    *screen = XScreenNumberOfScreen(XDefaultScreenOfDisplay(*display));
+#endif
+  }
+  glXQueryVersion(*display, &major, &minor);
+  GLAD_GLX_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
+  GLAD_GLX_VERSION_1_1 = (major == 1 && minor >= 1) || major > 1;
+  GLAD_GLX_VERSION_1_2 = (major == 1 && minor >= 2) || major > 1;
+  GLAD_GLX_VERSION_1_3 = (major == 1 && minor >= 3) || major > 1;
+  GLAD_GLX_VERSION_1_4 = (major == 1 && minor >= 4) || major > 1;
+  return GLAD_MAKE_VERSION(major, minor);
+}
+
+int gladLoadGLXUserPtr(Display *display, int screen, GLADuserptrloadfunc load, void *userptr)
+{
+  int version;
+  glXQueryVersion = (PFNGLXQUERYVERSIONPROC)load(userptr, "glXQueryVersion");
+  if (glXQueryVersion == NULL) return 0;
+  version = glad_glx_find_core_glx(&display, &screen);
+
+  glad_glx_load_GLX_VERSION_1_0(load, userptr);
+  glad_glx_load_GLX_VERSION_1_1(load, userptr);
+  glad_glx_load_GLX_VERSION_1_2(load, userptr);
+  glad_glx_load_GLX_VERSION_1_3(load, userptr);
+  glad_glx_load_GLX_VERSION_1_4(load, userptr);
+
+  if (!glad_glx_find_extensions(display, screen)) return 0;
+  glad_glx_load_GLX_ARB_create_context(load, userptr);
+
+  glad_glx_resolve_aliases();
+
+  return version;
+}
+
+int gladLoadGLX(Display *display, int screen, GLADloadfunc load)
+{
+  return gladLoadGLXUserPtr(display, screen, glad_glx_get_proc_from_userptr,
+                            GLAD_GNUC_EXTENSION(void *) load);
+}
 
 #ifdef GLAD_GLX
 
@@ -832,113 +833,117 @@ int gladLoadGLX(Display *display, int screen, GLADloadfunc load) {
 #include <dlfcn.h>
 #endif
 
+static void *glad_get_dlopen_handle(const char *lib_names[], int length)
+{
+  void *handle = NULL;
+  int i;
 
-static void* glad_get_dlopen_handle(const char *lib_names[], int length) {
-    void *handle = NULL;
-    int i;
-
-    for (i = 0; i < length; ++i) {
+  for (i = 0; i < length; ++i) {
 #if GLAD_PLATFORM_WIN32
-  #if GLAD_PLATFORM_UWP
-        size_t buffer_size = (strlen(lib_names[i]) + 1) * sizeof(WCHAR);
-        LPWSTR buffer = (LPWSTR) malloc(buffer_size);
-        if (buffer != NULL) {
-            int ret = MultiByteToWideChar(CP_ACP, 0, lib_names[i], -1, buffer, buffer_size);
-            if (ret != 0) {
-                handle = (void*) LoadPackagedLibrary(buffer, 0);
-            }
-            free((void*) buffer);
-        }
-  #else
-        handle = (void*) LoadLibraryA(lib_names[i]);
-  #endif
-#else
-        handle = dlopen(lib_names[i], RTLD_LAZY | RTLD_LOCAL);
-#endif
-        if (handle != NULL) {
-            return handle;
-        }
+#if GLAD_PLATFORM_UWP
+    size_t buffer_size = (strlen(lib_names[i]) + 1) * sizeof(WCHAR);
+    LPWSTR buffer = (LPWSTR)malloc(buffer_size);
+    if (buffer != NULL) {
+      int ret = MultiByteToWideChar(CP_ACP, 0, lib_names[i], -1, buffer, buffer_size);
+      if (ret != 0) {
+        handle = (void *)LoadPackagedLibrary(buffer, 0);
+      }
+      free((void *)buffer);
     }
-
-    return NULL;
-}
-
-static void glad_close_dlopen_handle(void* handle) {
+#else
+    handle = (void *)LoadLibraryA(lib_names[i]);
+#endif
+#else
+    handle = dlopen(lib_names[i], RTLD_LAZY | RTLD_LOCAL);
+#endif
     if (handle != NULL) {
-#if GLAD_PLATFORM_WIN32
-        FreeLibrary((HMODULE) handle);
-#else
-        dlclose(handle);
-#endif
+      return handle;
     }
+  }
+
+  return NULL;
 }
 
-static GLADapiproc glad_dlsym_handle(void* handle, const char *name) {
-    if (handle == NULL) {
-        return NULL;
-    }
+static void glad_close_dlopen_handle(void *handle)
+{
+  if (handle != NULL) {
+#if GLAD_PLATFORM_WIN32
+    FreeLibrary((HMODULE)handle);
+#else
+    dlclose(handle);
+#endif
+  }
+}
+
+static GLADapiproc glad_dlsym_handle(void *handle, const char *name)
+{
+  if (handle == NULL) {
+    return NULL;
+  }
 
 #if GLAD_PLATFORM_WIN32
-    return (GLADapiproc) GetProcAddress((HMODULE) handle, name);
+  return (GLADapiproc)GetProcAddress((HMODULE)handle, name);
 #else
-    return GLAD_GNUC_EXTENSION (GLADapiproc) dlsym(handle, name);
+  return GLAD_GNUC_EXTENSION(GLADapiproc) dlsym(handle, name);
 #endif
 }
 
 #endif /* GLAD_LOADER_LIBRARY_C_ */
 
-typedef void* (GLAD_API_PTR *GLADglxprocaddrfunc)(const char*);
+typedef void *(GLAD_API_PTR *GLADglxprocaddrfunc)(const char *);
 
-static GLADapiproc glad_glx_get_proc(void *userptr, const char *name) {
-    return GLAD_GNUC_EXTENSION ((GLADapiproc (*)(const char *name)) userptr)(name);
+static GLADapiproc glad_glx_get_proc(void *userptr, const char *name)
+{
+  return GLAD_GNUC_EXTENSION((GLADapiproc (*)(const char *name))userptr)(name);
 }
 
-static void* _glx_handle;
+static void *_glx_handle;
 
-static void* glad_glx_dlopen_handle(void) {
-    static const char *NAMES[] = {
+static void *glad_glx_dlopen_handle(void)
+{
+  static const char *NAMES[] = {
 #if defined __CYGWIN__
-        "libGL-1.so",
+    "libGL-1.so",
 #endif
-        "libGL.so.1",
-        "libGL.so"
-    };
+    "libGL.so.1", "libGL.so"};
 
-    if (_glx_handle == NULL) {
-        _glx_handle = glad_get_dlopen_handle(NAMES, sizeof(NAMES) / sizeof(NAMES[0]));
-    }
+  if (_glx_handle == NULL) {
+    _glx_handle = glad_get_dlopen_handle(NAMES, sizeof(NAMES) / sizeof(NAMES[0]));
+  }
 
-    return _glx_handle;
+  return _glx_handle;
 }
 
-int gladLoaderLoadGLX(Display *display, int screen) {
-    int version = 0;
-    void *handle = NULL;
-    int did_load = 0;
-    GLADglxprocaddrfunc loader;
+int gladLoaderLoadGLX(Display *display, int screen)
+{
+  int version = 0;
+  void *handle = NULL;
+  int did_load = 0;
+  GLADglxprocaddrfunc loader;
 
-    did_load = _glx_handle == NULL;
-    handle = glad_glx_dlopen_handle();
-    if (handle != NULL) {
-        loader = (GLADglxprocaddrfunc) glad_dlsym_handle(handle, "glXGetProcAddressARB");
-        if (loader != NULL) {
-            version = gladLoadGLXUserPtr(display, screen, glad_glx_get_proc, GLAD_GNUC_EXTENSION (void*) loader);
-        }
-
-        if (!version && did_load) {
-            gladLoaderUnloadGLX();
-        }
+  did_load = _glx_handle == NULL;
+  handle = glad_glx_dlopen_handle();
+  if (handle != NULL) {
+    loader = (GLADglxprocaddrfunc)glad_dlsym_handle(handle, "glXGetProcAddressARB");
+    if (loader != NULL) {
+      version =
+        gladLoadGLXUserPtr(display, screen, glad_glx_get_proc, GLAD_GNUC_EXTENSION(void *) loader);
     }
 
-    return version;
+    if (!version && did_load) {
+      gladLoaderUnloadGLX();
+    }
+  }
+
+  return version;
 }
 
-
-void gladLoaderUnloadGLX() {
-    if (_glx_handle != NULL) {
-        glad_close_dlopen_handle(_glx_handle);
-        _glx_handle = NULL;
-    }
+void gladLoaderUnloadGLX()
+{
+  if (_glx_handle != NULL) {
+    glad_close_dlopen_handle(_glx_handle);
+    _glx_handle = NULL;
+  }
 }
 
 #endif /* GLAD_GLX */
@@ -948,4 +953,3 @@ void gladLoaderUnloadGLX() {
 #endif
 
 #endif /* GLAD_GLX_IMPLEMENTATION */
-

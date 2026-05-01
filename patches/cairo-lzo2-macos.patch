@@ -5,7 +5,7 @@ diff --color -ur cairo-1.18.0/meson.build cairo-1.18.0-macos/meson.build
 @@ -195,7 +195,7 @@
    endif
  endif
- 
+
 -lzo_dep = dependency('lzo2', required: false)
 +lzo_dep = dependency('', required: false)
  if lzo_dep.found()

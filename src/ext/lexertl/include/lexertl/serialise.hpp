@@ -9,20 +9,19 @@
 #include "state_machine.hpp"
 #include <boost/serialization/vector.hpp>
 
-namespace lexertl
+namespace lexertl {
+// IMPORTANT! This won't work if you don't enable RTTI!
+template <typename CharT, typename id_type, class Archive>
+void serialise(basic_state_machine<CharT, id_type>& sm_, Archive& ar_)
 {
-    // IMPORTANT! This won't work if you don't enable RTTI!
-    template<typename CharT, typename id_type, class Archive>
-    void serialise(basic_state_machine<CharT, id_type>& sm_, Archive& ar_)
-    {
-        detail::basic_internals<id_type>& internals_ = sm_.data();
+  detail::basic_internals<id_type>& internals_ = sm_.data();
 
-        ar_& internals_._eoi;
-        ar_&* internals_._lookup;
-        ar_& internals_._dfa_alphabet;
-        ar_& internals_._features;
-        ar_&* internals_._dfa;
-    }
+  ar_ & internals_._eoi;
+  ar_&*internals_._lookup;
+  ar_ & internals_._dfa_alphabet;
+  ar_ & internals_._features;
+  ar_&*internals_._dfa;
 }
+}  // namespace lexertl
 
 #endif

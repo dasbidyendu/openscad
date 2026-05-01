@@ -19,7 +19,9 @@
  *  - ON_DEMAND = False
  *
  * Commandline:
- *    --merge --api='wgl=1.0' --extensions='WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_ARB_extensions_string,WGL_EXT_extensions_string' c --alias --header-only --loader
+ *    --merge --api='wgl=1.0'
+ * --extensions='WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_ARB_extensions_string,WGL_EXT_extensions_string'
+ * c --alias --header-only --loader
  *
  * Online:
  *    http://glad.sh/#api=wgl%3D1.0&extensions=WGL_ARB_create_context%2CWGL_ARB_create_context_profile%2CWGL_ARB_extensions_string%2CWGL_EXT_extensions_string&generator=c&options=MERGE%2CALIAS%2CHEADER_ONLY%2CLOADER
@@ -45,92 +47,92 @@ extern "C" {
 #define GLAD_PLATFORM_H_
 
 #ifndef GLAD_PLATFORM_WIN32
-  #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__)
-    #define GLAD_PLATFORM_WIN32 1
-  #else
-    #define GLAD_PLATFORM_WIN32 0
-  #endif
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__)
+#define GLAD_PLATFORM_WIN32 1
+#else
+#define GLAD_PLATFORM_WIN32 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_APPLE
-  #ifdef __APPLE__
-    #define GLAD_PLATFORM_APPLE 1
-  #else
-    #define GLAD_PLATFORM_APPLE 0
-  #endif
+#ifdef __APPLE__
+#define GLAD_PLATFORM_APPLE 1
+#else
+#define GLAD_PLATFORM_APPLE 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_EMSCRIPTEN
-  #ifdef __EMSCRIPTEN__
-    #define GLAD_PLATFORM_EMSCRIPTEN 1
-  #else
-    #define GLAD_PLATFORM_EMSCRIPTEN 0
-  #endif
+#ifdef __EMSCRIPTEN__
+#define GLAD_PLATFORM_EMSCRIPTEN 1
+#else
+#define GLAD_PLATFORM_EMSCRIPTEN 0
+#endif
 #endif
 
 #ifndef GLAD_PLATFORM_UWP
-  #if defined(_MSC_VER) && !defined(GLAD_INTERNAL_HAVE_WINAPIFAMILY)
-    #ifdef __has_include
-      #if __has_include(<winapifamily.h>)
-        #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
-      #endif
-    #elif _MSC_VER >= 1700 && !_USING_V110_SDK71_
-      #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
-    #endif
-  #endif
+#if defined(_MSC_VER) && !defined(GLAD_INTERNAL_HAVE_WINAPIFAMILY)
+#ifdef __has_include
+#if __has_include(<winapifamily.h>)
+#define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
+#endif
+#elif _MSC_VER >= 1700 && !_USING_V110_SDK71_
+#define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
+#endif
+#endif
 
-  #ifdef GLAD_INTERNAL_HAVE_WINAPIFAMILY
-    #include <winapifamily.h>
-    #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
-      #define GLAD_PLATFORM_UWP 1
-    #endif
-  #endif
+#ifdef GLAD_INTERNAL_HAVE_WINAPIFAMILY
+#include <winapifamily.h>
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#define GLAD_PLATFORM_UWP 1
+#endif
+#endif
 
-  #ifndef GLAD_PLATFORM_UWP
-    #define GLAD_PLATFORM_UWP 0
-  #endif
+#ifndef GLAD_PLATFORM_UWP
+#define GLAD_PLATFORM_UWP 0
+#endif
 #endif
 
 #ifdef __GNUC__
-  #define GLAD_GNUC_EXTENSION __extension__
+#define GLAD_GNUC_EXTENSION __extension__
 #else
-  #define GLAD_GNUC_EXTENSION
+#define GLAD_GNUC_EXTENSION
 #endif
 
 #define GLAD_UNUSED(x) (void)(x)
 
 #ifndef GLAD_API_CALL
-  #if defined(GLAD_API_CALL_EXPORT)
-    #if GLAD_PLATFORM_WIN32 || defined(__CYGWIN__)
-      #if defined(GLAD_API_CALL_EXPORT_BUILD)
-        #if defined(__GNUC__)
-          #define GLAD_API_CALL __attribute__ ((dllexport)) extern
-        #else
-          #define GLAD_API_CALL __declspec(dllexport) extern
-        #endif
-      #else
-        #if defined(__GNUC__)
-          #define GLAD_API_CALL __attribute__ ((dllimport)) extern
-        #else
-          #define GLAD_API_CALL __declspec(dllimport) extern
-        #endif
-      #endif
-    #elif defined(__GNUC__) && defined(GLAD_API_CALL_EXPORT_BUILD)
-      #define GLAD_API_CALL __attribute__ ((visibility ("default"))) extern
-    #else
-      #define GLAD_API_CALL extern
-    #endif
-  #else
-    #define GLAD_API_CALL extern
-  #endif
+#if defined(GLAD_API_CALL_EXPORT)
+#if GLAD_PLATFORM_WIN32 || defined(__CYGWIN__)
+#if defined(GLAD_API_CALL_EXPORT_BUILD)
+#if defined(__GNUC__)
+#define GLAD_API_CALL __attribute__((dllexport)) extern
+#else
+#define GLAD_API_CALL __declspec(dllexport) extern
+#endif
+#else
+#if defined(__GNUC__)
+#define GLAD_API_CALL __attribute__((dllimport)) extern
+#else
+#define GLAD_API_CALL __declspec(dllimport) extern
+#endif
+#endif
+#elif defined(__GNUC__) && defined(GLAD_API_CALL_EXPORT_BUILD)
+#define GLAD_API_CALL __attribute__((visibility("default"))) extern
+#else
+#define GLAD_API_CALL extern
+#endif
+#else
+#define GLAD_API_CALL extern
+#endif
 #endif
 
 #ifdef APIENTRY
-  #define GLAD_API_PTR APIENTRY
+#define GLAD_API_PTR APIENTRY
 #elif GLAD_PLATFORM_WIN32
-  #define GLAD_API_PTR __stdcall
+#define GLAD_API_PTR __stdcall
 #else
-  #define GLAD_API_PTR
+#define GLAD_API_PTR
 #endif
 
 #ifndef GLAPI
@@ -202,43 +204,12 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define WGL_SWAP_UNDERLAY8 0x00800000
 #define WGL_SWAP_UNDERLAY9 0x01000000
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 struct _GPU_DEVICE {
-    DWORD  cb;
-    CHAR   DeviceName[32];
-    CHAR   DeviceString[128];
-    DWORD  Flags;
-    RECT   rcVirtualScreen;
+  DWORD cb;
+  CHAR DeviceName[32];
+  CHAR DeviceString[128];
+  DWORD Flags;
+  RECT rcVirtualScreen;
 };
 DECLARE_HANDLE(HPBUFFERARB);
 DECLARE_HANDLE(HPBUFFEREXT);
@@ -249,7 +220,6 @@ DECLARE_HANDLE(HGPUNV);
 DECLARE_HANDLE(HVIDEOINPUTDEVICENV);
 typedef struct _GPU_DEVICE GPU_DEVICE;
 typedef struct _GPU_DEVICE *PGPU_DEVICE;
-
 
 #define WGL_VERSION_1_0 1
 GLAD_API_CALL int GLAD_WGL_VERSION_1_0;
@@ -262,36 +232,47 @@ GLAD_API_CALL int GLAD_WGL_ARB_extensions_string;
 #define WGL_EXT_extensions_string 1
 GLAD_API_CALL int GLAD_WGL_EXT_extensions_string;
 
-
-typedef int (GLAD_API_PTR *PFNCHOOSEPIXELFORMATPROC)(HDC hDc, const PIXELFORMATDESCRIPTOR * pPfd);
-typedef int (GLAD_API_PTR *PFNDESCRIBEPIXELFORMATPROC)(HDC hdc, int ipfd, UINT cjpfd, PIXELFORMATDESCRIPTOR * ppfd);
-typedef UINT (GLAD_API_PTR *PFNGETENHMETAFILEPIXELFORMATPROC)(HENHMETAFILE hemf, UINT cbBuffer, PIXELFORMATDESCRIPTOR * ppfd);
-typedef int (GLAD_API_PTR *PFNGETPIXELFORMATPROC)(HDC hdc);
-typedef BOOL (GLAD_API_PTR *PFNSETPIXELFORMATPROC)(HDC hdc, int ipfd, const PIXELFORMATDESCRIPTOR * ppfd);
-typedef BOOL (GLAD_API_PTR *PFNSWAPBUFFERSPROC)(HDC hdc);
-typedef BOOL (GLAD_API_PTR *PFNWGLCOPYCONTEXTPROC)(HGLRC hglrcSrc, HGLRC hglrcDst, UINT mask);
-typedef HGLRC (GLAD_API_PTR *PFNWGLCREATECONTEXTPROC)(HDC hDc);
-typedef HGLRC (GLAD_API_PTR *PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int * attribList);
-typedef HGLRC (GLAD_API_PTR *PFNWGLCREATELAYERCONTEXTPROC)(HDC hDc, int level);
-typedef BOOL (GLAD_API_PTR *PFNWGLDELETECONTEXTPROC)(HGLRC oldContext);
-typedef BOOL (GLAD_API_PTR *PFNWGLDESCRIBELAYERPLANEPROC)(HDC hDc, int pixelFormat, int layerPlane, UINT nBytes, LAYERPLANEDESCRIPTOR * plpd);
-typedef HGLRC (GLAD_API_PTR *PFNWGLGETCURRENTCONTEXTPROC)(void);
-typedef HDC (GLAD_API_PTR *PFNWGLGETCURRENTDCPROC)(void);
-typedef const char * (GLAD_API_PTR *PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC hdc);
-typedef const char * (GLAD_API_PTR *PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
-typedef int (GLAD_API_PTR *PFNWGLGETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart, int cEntries, COLORREF * pcr);
-typedef PROC (GLAD_API_PTR *PFNWGLGETPROCADDRESSPROC)(LPCSTR lpszProc);
-typedef BOOL (GLAD_API_PTR *PFNWGLMAKECURRENTPROC)(HDC hDc, HGLRC newContext);
-typedef BOOL (GLAD_API_PTR *PFNWGLREALIZELAYERPALETTEPROC)(HDC hdc, int iLayerPlane, BOOL bRealize);
-typedef int (GLAD_API_PTR *PFNWGLSETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart, int cEntries, const COLORREF * pcr);
-typedef BOOL (GLAD_API_PTR *PFNWGLSHARELISTSPROC)(HGLRC hrcSrvShare, HGLRC hrcSrvSource);
-typedef BOOL (GLAD_API_PTR *PFNWGLSWAPLAYERBUFFERSPROC)(HDC hdc, UINT fuFlags);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTBITMAPSPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTBITMAPSAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTBITMAPSWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTOUTLINESPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase, FLOAT deviation, FLOAT extrusion, int format, LPGLYPHMETRICSFLOAT lpgmf);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTOUTLINESAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase, FLOAT deviation, FLOAT extrusion, int format, LPGLYPHMETRICSFLOAT lpgmf);
-typedef BOOL (GLAD_API_PTR *PFNWGLUSEFONTOUTLINESWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase, FLOAT deviation, FLOAT extrusion, int format, LPGLYPHMETRICSFLOAT lpgmf);
+typedef int(GLAD_API_PTR *PFNCHOOSEPIXELFORMATPROC)(HDC hDc, const PIXELFORMATDESCRIPTOR *pPfd);
+typedef int(GLAD_API_PTR *PFNDESCRIBEPIXELFORMATPROC)(HDC hdc, int ipfd, UINT cjpfd,
+                                                      PIXELFORMATDESCRIPTOR *ppfd);
+typedef UINT(GLAD_API_PTR *PFNGETENHMETAFILEPIXELFORMATPROC)(HENHMETAFILE hemf, UINT cbBuffer,
+                                                             PIXELFORMATDESCRIPTOR *ppfd);
+typedef int(GLAD_API_PTR *PFNGETPIXELFORMATPROC)(HDC hdc);
+typedef BOOL(GLAD_API_PTR *PFNSETPIXELFORMATPROC)(HDC hdc, int ipfd, const PIXELFORMATDESCRIPTOR *ppfd);
+typedef BOOL(GLAD_API_PTR *PFNSWAPBUFFERSPROC)(HDC hdc);
+typedef BOOL(GLAD_API_PTR *PFNWGLCOPYCONTEXTPROC)(HGLRC hglrcSrc, HGLRC hglrcDst, UINT mask);
+typedef HGLRC(GLAD_API_PTR *PFNWGLCREATECONTEXTPROC)(HDC hDc);
+typedef HGLRC(GLAD_API_PTR *PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext,
+                                                               const int *attribList);
+typedef HGLRC(GLAD_API_PTR *PFNWGLCREATELAYERCONTEXTPROC)(HDC hDc, int level);
+typedef BOOL(GLAD_API_PTR *PFNWGLDELETECONTEXTPROC)(HGLRC oldContext);
+typedef BOOL(GLAD_API_PTR *PFNWGLDESCRIBELAYERPLANEPROC)(HDC hDc, int pixelFormat, int layerPlane,
+                                                         UINT nBytes, LAYERPLANEDESCRIPTOR *plpd);
+typedef HGLRC(GLAD_API_PTR *PFNWGLGETCURRENTCONTEXTPROC)(void);
+typedef HDC(GLAD_API_PTR *PFNWGLGETCURRENTDCPROC)(void);
+typedef const char *(GLAD_API_PTR *PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC hdc);
+typedef const char *(GLAD_API_PTR *PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
+typedef int(GLAD_API_PTR *PFNWGLGETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart,
+                                                            int cEntries, COLORREF *pcr);
+typedef PROC(GLAD_API_PTR *PFNWGLGETPROCADDRESSPROC)(LPCSTR lpszProc);
+typedef BOOL(GLAD_API_PTR *PFNWGLMAKECURRENTPROC)(HDC hDc, HGLRC newContext);
+typedef BOOL(GLAD_API_PTR *PFNWGLREALIZELAYERPALETTEPROC)(HDC hdc, int iLayerPlane, BOOL bRealize);
+typedef int(GLAD_API_PTR *PFNWGLSETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart,
+                                                            int cEntries, const COLORREF *pcr);
+typedef BOOL(GLAD_API_PTR *PFNWGLSHARELISTSPROC)(HGLRC hrcSrvShare, HGLRC hrcSrvSource);
+typedef BOOL(GLAD_API_PTR *PFNWGLSWAPLAYERBUFFERSPROC)(HDC hdc, UINT fuFlags);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTBITMAPSPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTBITMAPSAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTBITMAPSWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTOUTLINESPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                      FLOAT deviation, FLOAT extrusion, int format,
+                                                      LPGLYPHMETRICSFLOAT lpgmf);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTOUTLINESAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                       FLOAT deviation, FLOAT extrusion, int format,
+                                                       LPGLYPHMETRICSFLOAT lpgmf);
+typedef BOOL(GLAD_API_PTR *PFNWGLUSEFONTOUTLINESWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                       FLOAT deviation, FLOAT extrusion, int format,
+                                                       LPGLYPHMETRICSFLOAT lpgmf);
 
 GLAD_API_CALL PFNWGLCREATECONTEXTATTRIBSARBPROC glad_wglCreateContextAttribsARB;
 #define wglCreateContextAttribsARB glad_wglCreateContextAttribsARB
@@ -299,10 +280,6 @@ GLAD_API_CALL PFNWGLGETEXTENSIONSSTRINGARBPROC glad_wglGetExtensionsStringARB;
 #define wglGetExtensionsStringARB glad_wglGetExtensionsStringARB
 GLAD_API_CALL PFNWGLGETEXTENSIONSSTRINGEXTPROC glad_wglGetExtensionsStringEXT;
 #define wglGetExtensionsStringEXT glad_wglGetExtensionsStringEXT
-
-
-
-
 
 GLAD_API_CALL int gladLoadWGLUserPtr(HDC hdc, GLADuserptrloadfunc load, void *userptr);
 GLAD_API_CALL int gladLoadWGL(HDC hdc, GLADloadfunc load);
@@ -341,123 +318,125 @@ GLAD_API_CALL int gladLoaderLoadWGL(HDC hdc);
 extern "C" {
 #endif
 
-
-
 int GLAD_WGL_VERSION_1_0 = 0;
 int GLAD_WGL_ARB_create_context = 0;
 int GLAD_WGL_ARB_create_context_profile = 0;
 int GLAD_WGL_ARB_extensions_string = 0;
 int GLAD_WGL_EXT_extensions_string = 0;
 
-
-
 PFNWGLCREATECONTEXTATTRIBSARBPROC glad_wglCreateContextAttribsARB = NULL;
 PFNWGLGETEXTENSIONSSTRINGARBPROC glad_wglGetExtensionsStringARB = NULL;
 PFNWGLGETEXTENSIONSSTRINGEXTPROC glad_wglGetExtensionsStringEXT = NULL;
 
-
-static void glad_wgl_load_WGL_ARB_create_context(GLADuserptrloadfunc load, void *userptr) {
-    if(!GLAD_WGL_ARB_create_context) return;
-    glad_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) load(userptr, "wglCreateContextAttribsARB");
+static void glad_wgl_load_WGL_ARB_create_context(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_WGL_ARB_create_context) return;
+  glad_wglCreateContextAttribsARB =
+    (PFNWGLCREATECONTEXTATTRIBSARBPROC)load(userptr, "wglCreateContextAttribsARB");
 }
-static void glad_wgl_load_WGL_ARB_extensions_string(GLADuserptrloadfunc load, void *userptr) {
-    if(!GLAD_WGL_ARB_extensions_string) return;
-    glad_wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC) load(userptr, "wglGetExtensionsStringARB");
+static void glad_wgl_load_WGL_ARB_extensions_string(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_WGL_ARB_extensions_string) return;
+  glad_wglGetExtensionsStringARB =
+    (PFNWGLGETEXTENSIONSSTRINGARBPROC)load(userptr, "wglGetExtensionsStringARB");
 }
-static void glad_wgl_load_WGL_EXT_extensions_string(GLADuserptrloadfunc load, void *userptr) {
-    if(!GLAD_WGL_EXT_extensions_string) return;
-    glad_wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC) load(userptr, "wglGetExtensionsStringEXT");
+static void glad_wgl_load_WGL_EXT_extensions_string(GLADuserptrloadfunc load, void *userptr)
+{
+  if (!GLAD_WGL_EXT_extensions_string) return;
+  glad_wglGetExtensionsStringEXT =
+    (PFNWGLGETEXTENSIONSSTRINGEXTPROC)load(userptr, "wglGetExtensionsStringEXT");
 }
 
-
-static void glad_wgl_resolve_aliases(void) {
+static void glad_wgl_resolve_aliases(void)
+{
 }
 
-static int glad_wgl_has_extension(HDC hdc, const char *ext) {
-    const char *terminator;
-    const char *loc;
-    const char *extensions;
+static int glad_wgl_has_extension(HDC hdc, const char *ext)
+{
+  const char *terminator;
+  const char *loc;
+  const char *extensions;
 
-    if(wglGetExtensionsStringEXT == NULL && wglGetExtensionsStringARB == NULL)
-        return 0;
+  if (wglGetExtensionsStringEXT == NULL && wglGetExtensionsStringARB == NULL) return 0;
 
-    if(wglGetExtensionsStringARB == NULL || hdc == INVALID_HANDLE_VALUE)
-        extensions = wglGetExtensionsStringEXT();
-    else
-        extensions = wglGetExtensionsStringARB(hdc);
+  if (wglGetExtensionsStringARB == NULL || hdc == INVALID_HANDLE_VALUE)
+    extensions = wglGetExtensionsStringEXT();
+  else extensions = wglGetExtensionsStringARB(hdc);
 
-    if(extensions == NULL || ext == NULL)
-        return 0;
+  if (extensions == NULL || ext == NULL) return 0;
 
-    while(1) {
-        loc = strstr(extensions, ext);
-        if(loc == NULL)
-            break;
+  while (1) {
+    loc = strstr(extensions, ext);
+    if (loc == NULL) break;
 
-        terminator = loc + strlen(ext);
-        if((loc == extensions || *(loc - 1) == ' ') &&
-            (*terminator == ' ' || *terminator == '\0'))
-        {
-            return 1;
-        }
-        extensions = terminator;
+    terminator = loc + strlen(ext);
+    if ((loc == extensions || *(loc - 1) == ' ') && (*terminator == ' ' || *terminator == '\0')) {
+      return 1;
     }
+    extensions = terminator;
+  }
 
-    return 0;
+  return 0;
 }
 
-static GLADapiproc glad_wgl_get_proc_from_userptr(void *userptr, const char* name) {
-    return (GLAD_GNUC_EXTENSION (GLADapiproc (*)(const char *name)) userptr)(name);
+static GLADapiproc glad_wgl_get_proc_from_userptr(void *userptr, const char *name)
+{
+  return (GLAD_GNUC_EXTENSION(GLADapiproc (*)(const char *name)) userptr)(name);
 }
 
-static int glad_wgl_find_extensions_wgl(HDC hdc) {
-    GLAD_WGL_ARB_create_context = glad_wgl_has_extension(hdc, "WGL_ARB_create_context");
-    GLAD_WGL_ARB_create_context_profile = glad_wgl_has_extension(hdc, "WGL_ARB_create_context_profile");
-    GLAD_WGL_ARB_extensions_string = glad_wgl_has_extension(hdc, "WGL_ARB_extensions_string");
-    GLAD_WGL_EXT_extensions_string = glad_wgl_has_extension(hdc, "WGL_EXT_extensions_string");
-    return 1;
+static int glad_wgl_find_extensions_wgl(HDC hdc)
+{
+  GLAD_WGL_ARB_create_context = glad_wgl_has_extension(hdc, "WGL_ARB_create_context");
+  GLAD_WGL_ARB_create_context_profile = glad_wgl_has_extension(hdc, "WGL_ARB_create_context_profile");
+  GLAD_WGL_ARB_extensions_string = glad_wgl_has_extension(hdc, "WGL_ARB_extensions_string");
+  GLAD_WGL_EXT_extensions_string = glad_wgl_has_extension(hdc, "WGL_EXT_extensions_string");
+  return 1;
 }
 
-static int glad_wgl_find_core_wgl(void) {
-    int major = 1, minor = 0;
-    GLAD_WGL_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
-    return GLAD_MAKE_VERSION(major, minor);
+static int glad_wgl_find_core_wgl(void)
+{
+  int major = 1, minor = 0;
+  GLAD_WGL_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
+  return GLAD_MAKE_VERSION(major, minor);
 }
 
-int gladLoadWGLUserPtr(HDC hdc, GLADuserptrloadfunc load, void *userptr) {
-    int version;
-    wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC) load(userptr, "wglGetExtensionsStringARB");
-    wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC) load(userptr, "wglGetExtensionsStringEXT");
-    if(wglGetExtensionsStringARB == NULL && wglGetExtensionsStringEXT == NULL) return 0;
-    version = glad_wgl_find_core_wgl();
+int gladLoadWGLUserPtr(HDC hdc, GLADuserptrloadfunc load, void *userptr)
+{
+  int version;
+  wglGetExtensionsStringARB =
+    (PFNWGLGETEXTENSIONSSTRINGARBPROC)load(userptr, "wglGetExtensionsStringARB");
+  wglGetExtensionsStringEXT =
+    (PFNWGLGETEXTENSIONSSTRINGEXTPROC)load(userptr, "wglGetExtensionsStringEXT");
+  if (wglGetExtensionsStringARB == NULL && wglGetExtensionsStringEXT == NULL) return 0;
+  version = glad_wgl_find_core_wgl();
 
+  if (!glad_wgl_find_extensions_wgl(hdc)) return 0;
+  glad_wgl_load_WGL_ARB_create_context(load, userptr);
+  glad_wgl_load_WGL_ARB_extensions_string(load, userptr);
+  glad_wgl_load_WGL_EXT_extensions_string(load, userptr);
 
-    if (!glad_wgl_find_extensions_wgl(hdc)) return 0;
-    glad_wgl_load_WGL_ARB_create_context(load, userptr);
-    glad_wgl_load_WGL_ARB_extensions_string(load, userptr);
-    glad_wgl_load_WGL_EXT_extensions_string(load, userptr);
+  glad_wgl_resolve_aliases();
 
-    glad_wgl_resolve_aliases();
-
-    return version;
+  return version;
 }
 
-int gladLoadWGL(HDC hdc, GLADloadfunc load) {
-    return gladLoadWGLUserPtr(hdc, glad_wgl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
+int gladLoadWGL(HDC hdc, GLADloadfunc load)
+{
+  return gladLoadWGLUserPtr(hdc, glad_wgl_get_proc_from_userptr, GLAD_GNUC_EXTENSION(void *) load);
 }
- 
 
 #ifdef GLAD_WGL
 
-static GLADapiproc glad_wgl_get_proc(void *vuserptr, const char* name) {
-    GLAD_UNUSED(vuserptr);
-    return GLAD_GNUC_EXTENSION (GLADapiproc) wglGetProcAddress(name);
+static GLADapiproc glad_wgl_get_proc(void *vuserptr, const char *name)
+{
+  GLAD_UNUSED(vuserptr);
+  return GLAD_GNUC_EXTENSION(GLADapiproc) wglGetProcAddress(name);
 }
 
-int gladLoaderLoadWGL(HDC hdc) {
-    return gladLoadWGLUserPtr(hdc, glad_wgl_get_proc, NULL);
+int gladLoaderLoadWGL(HDC hdc)
+{
+  return gladLoadWGLUserPtr(hdc, glad_wgl_get_proc, NULL);
 }
-
 
 #endif /* GLAD_WGL */
 
@@ -466,4 +445,3 @@ int gladLoaderLoadWGL(HDC hdc) {
 #endif
 
 #endif /* GLAD_WGL_IMPLEMENTATION */
-

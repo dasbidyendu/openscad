@@ -1,4 +1,4 @@
-ECHO: 
+ECHO:
 ERROR: Unable to convert points = undef to a vector of coordinates in file allmodules.scad, line 19
 ERROR: Unable to convert points = undef to a vector of coordinates in file allmodules.scad, line 22
 WARNING: Unable to convert scale(undef) parameter to a number, a vec3 or vec2 of numbers or a number in file allmodules.scad, line 26

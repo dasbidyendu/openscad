@@ -1,9 +1,9 @@
 --- ../../libraries/install/include/CGAL/Nef_3/OGL_helper.h	2010-06-09 21:00:52.000000000 +0200
 +++ OGL_helper.h	2011-09-29 23:09:47.000000000 +0200
 @@ -243,6 +243,22 @@
-     glVertex3dv(pc); 
+     glVertex3dv(pc);
    }
- 
+
 +  inline void CGAL_GLU_TESS_CALLBACK combineCallback(GLdouble coords[3], GLvoid *[4], GLfloat [4], GLvoid **dataOut)
 +  { static std::list<GLdouble*> pcache;
 +    if (dataOut) {
@@ -20,7 +20,7 @@
 +    }
 +  }
 +
- 
+
   enum { SNC_AXES};
   enum { SNC_BOUNDARY, SNC_SKELETON };
 @@ -376,6 +392,8 @@
@@ -38,5 +38,5 @@
        gluDeleteTess(tess_);
 +      combineCallback(NULL, NULL, NULL, NULL);
      }
- 
+
      void construct_axes() const

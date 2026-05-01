@@ -156,7 +156,7 @@ def get_normalized_lines(filename, replace_paths=False):
 
     if options.exclude_line_re is None:
         return text.splitlines()
-    
+
     def include_line(line):
         include = not options.exclude_line_re.search(line)
         if options.exclude_debug:
@@ -165,7 +165,7 @@ def get_normalized_lines(filename, replace_paths=False):
             else:
                 print(f"X: {line}", file=sys.stderr)
         return include
-    
+
     return [ line for line in text.splitlines() if include_line(line) ]
 
 def compare_default(resultfilename):

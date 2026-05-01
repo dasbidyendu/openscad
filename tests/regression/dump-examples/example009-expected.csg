@@ -21,4 +21,3 @@ intersection() {
 		import(file = "example009.dxf", layer = "fan_side", origin = [0, -40], scale = 1, center = false, convexity = 1, $fn = 0, $fa = 3, $fs = 1, timestamp = 1544039412);
 	}
 }
-

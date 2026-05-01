@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 
 const browser = await puppeteer.launch({
-  headless: "new",
+  headless: 'new',
   args: [
     '--allow-file-access-from-files',
     '--allow-file-access',
@@ -15,9 +15,7 @@ try {
   page.on('pageerror', error => console.log('🔴 Page error:', error.message));
   page.on('requestfailed', request => console.log('🔴 Failed request:', request.url()));
 
-  await page.goto(new URL('./wasm-check.html', import.meta.url), {
-    waitUntil: 'networkidle0'
-  });
+  await page.goto(new URL('./wasm-check.html', import.meta.url), {waitUntil: 'networkidle0'});
 
   await page.waitForFunction(() => {
     const element = document.getElementById('output');

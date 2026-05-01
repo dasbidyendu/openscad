@@ -127,23 +127,23 @@ static constexpr ConfigValues kConfig = {
 // --------------------------------------------------------------
 
 // More clang-tidy config.
-static constexpr std::string_view kExtraArgs[] = {
-    "-Wno-unknown-pragmas", "-Wno-unknown-warning-option"};
+static constexpr std::string_view kExtraArgs[] = {"-Wno-unknown-pragmas", "-Wno-unknown-warning-option"};
 
 // All the extensions we consider
-inline bool IsOneOf(std::string_view s,
-                    std::initializer_list<std::string_view> options) {
-  return std::any_of(options.begin(), options.end(),
-                     [s](std::string_view value) { return value == s; });
+inline bool IsOneOf(std::string_view s, std::initializer_list<std::string_view> options)
+{
+  return std::any_of(options.begin(), options.end(), [s](std::string_view value) { return value == s; });
 }
 
 // Files that look like relevant include files.
-inline bool IsIncludeExtension(std::string_view extension) {
+inline bool IsIncludeExtension(std::string_view extension)
+{
   return IsOneOf(extension, {".h", ".hpp", ".hxx", ".inl"});
 }
 
 // Filter for source files to be considered.
-inline bool ConsiderExtension(const std::string_view ext) {
+inline bool ConsiderExtension(const std::string_view ext)
+{
   return IsOneOf(ext, {".cc", ".cpp", ".cxx"}) || IsIncludeExtension(ext);
 }
 
@@ -156,7 +156,8 @@ using hash_t = uint64_t;
 using filepath_contenthash_t = std::pair<fs::path, hash_t>;
 
 // Some helpers
-std::string GetContent(FILE *f) {
+std::string GetContent(FILE *f)
+{
   std::string result;
   if (!f) {
     return result;  // ¯\_(ツ)_/¯ best effort.
@@ -169,60 +170,68 @@ std::string GetContent(FILE *f) {
   return result;
 }
 
-std::string GetContent(const fs::path &f) {
+std::string GetContent(const fs::path& f)
+{
   FILE *file_to_read = fopen(f.string().c_str(), "r");
   if (!file_to_read) {
-    fprintf(stderr, "%s: can't open: %s\n", f.string().c_str(),
-            strerror(errno));
+    fprintf(stderr, "%s: can't open: %s\n", f.string().c_str(), strerror(errno));
     return {};  // ¯\_(ツ)_/¯ best effort.
   }
   return GetContent(file_to_read);
 }
 
-std::string_view EnvWithFallback(const char *var, std::string_view fallback) {
+std::string_view EnvWithFallback(const char *var, std::string_view fallback)
+{
   const char *value = getenv(var);
   return value ? value : fallback;
 }
 
-std::string_view GetClangTidyConfig() {
+std::string_view GetClangTidyConfig()
+{
   return EnvWithFallback("CLANG_TIDY_CONFIG", kConfig.clang_tidy_file);
 }
 
-std::string GetCommandOutput(const std::string &prog) {
+std::string GetCommandOutput(const std::string& prog)
+{
   return GetContent(popen(prog.c_str(), "r"));  // NOLINT
 }
 
-hash_t hashContent(const std::string &s) { return std::hash<std::string>()(s); }
-std::string ToHex(uint64_t value, int show_lower_nibbles = 16) {
+hash_t hashContent(const std::string& s)
+{
+  return std::hash<std::string>()(s);
+}
+std::string ToHex(uint64_t value, int show_lower_nibbles = 16)
+{
   char out[16 + 1];
   snprintf(out, sizeof(out), "%016" PRIx64, value);
   return out + (16 - show_lower_nibbles);
 }
 
 // Mapping filepath_contenthash_t to an actual location in the file system.
-class ContentAddressedStore {
- public:
-  explicit ContentAddressedStore(const fs::path &project_base_dir)
-      : content_dir(project_base_dir / "contents") {
+class ContentAddressedStore
+{
+public:
+  explicit ContentAddressedStore(const fs::path& project_base_dir)
+    : content_dir(project_base_dir / "contents")
+  {
     fs::create_directories(content_dir);
   }
 
   // Given filepath contenthash, return the path to read/write from.
-  fs::path PathFor(const filepath_contenthash_t &c) const {
+  fs::path PathFor(const filepath_contenthash_t& c) const
+  {
     // Name is human readable, the content hash makes it unique.
     std::string name_with_contenthash = c.first.filename().string();
     name_with_contenthash.append("-").append(ToHex(c.second));
     return content_dir / name_with_contenthash;
   }
 
-  std::string GetContentFor(const filepath_contenthash_t &c) const {
-    return GetContent(PathFor(c));
-  }
+  std::string GetContentFor(const filepath_contenthash_t& c) const { return GetContent(PathFor(c)); }
 
   // Check if this needs to be recreated, either because it is not there,
   // or is not empty and does not fit freshness requirements.
-  bool NeedsRefresh(const filepath_contenthash_t &c,
-                    file_time min_freshness) const {
+  bool NeedsRefresh(const filepath_contenthash_t& c, file_time min_freshness) const
+  {
     const fs::path content_hash_file = PathFor(c);
     if (!fs::exists(content_hash_file)) {
       return true;
@@ -231,39 +240,38 @@ class ContentAddressedStore {
     // If file exists but is broken (i.e. has a non-zero size with messages),
     // consider recreating if if older than compilation db.
     const bool timestamp_trigger =
-        kConfig.revisit_brokenfiles_if_build_config_newer &&
-        (fs::file_size(content_hash_file) > 0 &&
-         fs::last_write_time(content_hash_file) < min_freshness);
+      kConfig.revisit_brokenfiles_if_build_config_newer &&
+      (fs::file_size(content_hash_file) > 0 && fs::last_write_time(content_hash_file) < min_freshness);
     return timestamp_trigger;
   }
 
- private:
+private:
   const fs::path content_dir;
 };
 
-class ClangTidyRunner {
- public:
-  ClangTidyRunner(const std::string &cache_prefix, int argc, char **argv)
-      : clang_tidy_(EnvWithFallback("CLANG_TIDY", "clang-tidy")),
-        clang_tidy_args_(AssembleArgs(argc, argv)) {
+class ClangTidyRunner
+{
+public:
+  ClangTidyRunner(const std::string& cache_prefix, int argc, char **argv)
+    : clang_tidy_(EnvWithFallback("CLANG_TIDY", "clang-tidy")),
+      clang_tidy_args_(AssembleArgs(argc, argv))
+  {
     project_cache_dir_ = AssembleProjectCacheDir(cache_prefix);
   }
 
-  const fs::path &project_cache_dir() const { return project_cache_dir_; }
+  const fs::path& project_cache_dir() const { return project_cache_dir_; }
 
   // Given a work-queue in/out-file, process it. Using system() for portability.
   // Empties work_queue.
-  void RunClangTidyOn(ContentAddressedStore &output_store,
-                      std::list<filepath_contenthash_t> *work_queue) {
+  void RunClangTidyOn(ContentAddressedStore& output_store, std::list<filepath_contenthash_t> *work_queue)
+  {
     if (work_queue->empty()) {
       return;
     }
     const char *jobs_env_str = getenv("CLANG_TIDY_JOBS");
     const int jobs_env_num = jobs_env_str ? atoi(jobs_env_str) : -1;
-    const int kJobs = (jobs_env_num > 0 ? jobs_env_num
-                                        : std::thread::hardware_concurrency());
-    std::cerr << work_queue->size() << " files to process (w/ " << kJobs
-              << " jobs)...";
+    const int kJobs = (jobs_env_num > 0 ? jobs_env_num : std::thread::hardware_concurrency());
+    std::cerr << work_queue->size() << " files to process (w/ " << kJobs << " jobs)...";
 
     const bool print_progress = isatty(STDERR_FILENO);
     if (!print_progress) {
@@ -290,14 +298,12 @@ class ClangTidyRunner {
         const std::string tmp_out = final_out.string() + uniquifier + ".tmp";
         // Putting the file to clang-tidy early in the command line so that
         // it is easy to find with `ps` or `top`.
-        const std::string command = clang_tidy_ + " '" + work.first.string() +
-                                    "'" + clang_tidy_args_ + "> '" + tmp_out +
-                                    "' 2>/dev/null";
+        const std::string command = clang_tidy_ + " '" + work.first.string() + "'" + clang_tidy_args_ +
+                                    "> '" + tmp_out + "' 2>/dev/null";
         const int r = system(command.c_str());
 #ifdef WIFSIGNALED
         // NOLINTBEGIN
-        if (WIFSIGNALED(r) &&
-            (WTERMSIG(r) == SIGINT || WTERMSIG(r) == SIGQUIT)) {
+        if (WIFSIGNALED(r) && (WTERMSIG(r) == SIGINT || WTERMSIG(r) == SIGQUIT)) {
           std::error_code ignored_error;
           fs::remove(tmp_out, ignored_error);
           break;  // got Ctrl-C
@@ -313,7 +319,7 @@ class ClangTidyRunner {
     for (auto i = 0; i < kJobs; ++i) {
       workers.emplace_back(clang_tidy_runner);  // NOLINT
     }
-    for (auto &t : workers) {
+    for (auto& t : workers) {
       t.join();
     }
     if (print_progress) {
@@ -321,8 +327,9 @@ class ClangTidyRunner {
     }
   }
 
- private:
-  static fs::path GetCacheBaseDir() {
+private:
+  static fs::path GetCacheBaseDir()
+  {
     if (const char *from_env = getenv("CACHE_DIR")) {
       return fs::path{from_env};
     }
@@ -334,11 +341,10 @@ class ClangTidyRunner {
     return fs::path{EnvWithFallback("TMPDIR", "/tmp")};
   }
 
-  static std::string AssembleArgs(int argc, char **argv) {
+  static std::string AssembleArgs(int argc, char **argv)
+  {
     std::string result = " --quiet";
-    result.append(" '--config-file=")
-      .append(GetClangTidyConfig())
-        .append("'");
+    result.append(" '--config-file=").append(GetClangTidyConfig()).append("'");
     for (const std::string_view arg : kExtraArgs) {
       result.append(" --extra-arg='").append(arg).append("'");
     }
@@ -348,7 +354,8 @@ class ClangTidyRunner {
     return result;
   }
 
-  fs::path AssembleProjectCacheDir(const std::string &cache_prefix) const {
+  fs::path AssembleProjectCacheDir(const std::string& cache_prefix) const
+  {
     const fs::path cache_dir = GetCacheBaseDir() / "clang-tidy";
 
     // Use major version as part of name of our configuration specific dir.
@@ -359,23 +366,20 @@ class ClangTidyRunner {
     }
     std::smatch version_match;
     const std::string major_version =
-        std::regex_search(version, version_match,
-                          std::regex{"version ([0-9]+)"})
-            ? version_match[1].str()
-            : "UNKNOWN";
+      std::regex_search(version, version_match, std::regex{"version ([0-9]+)"}) ? version_match[1].str()
+                                                                                : "UNKNOWN";
 
     // Make sure directory filename depends on .clang-tidy content.
     hash_t cache_unique_id = hashContent(version + clang_tidy_args_);
     cache_unique_id ^= hashContent(GetContent(GetClangTidyConfig()));
-    return cache_dir / fs::path(cache_prefix + "v" + major_version + "_" +
-                                ToHex(cache_unique_id, 8));
+    return cache_dir / fs::path(cache_prefix + "v" + major_version + "_" + ToHex(cache_unique_id, 8));
   }
 
   // Fix filename paths found in logfiles that are not emitted relative to
   // project root in the log - remove that prefix.
   // (bazel has its own, so if this is bazel, also bazel-specific fix up that).
-  static void RepairFilenameOccurences(const fs::path &infile,
-                                       const fs::path &outfile) {
+  static void RepairFilenameOccurences(const fs::path& infile, const fs::path& outfile)
+  {
     static const std::regex sFixPathsRe = []() {
       std::string canonicalize_expr = "(^|\\n)(";  // fix names at start of line
       if (kConfig.is_bazel_project) {
@@ -386,8 +390,7 @@ class ClangTidyRunner {
         }
       }
       canonicalize_expr += fs::current_path().string() + "/";  // $(pwd)/
-      canonicalize_expr +=
-          ")?(\\./)?";  // Some start with, or have a trailing ./
+      canonicalize_expr += ")?(\\./)?";                        // Some start with, or have a trailing ./
       return std::regex{canonicalize_expr};
     }();
 
@@ -401,30 +404,32 @@ class ClangTidyRunner {
   fs::path project_cache_dir_;
 };
 
-class FileGatherer {
- public:
-  FileGatherer(ContentAddressedStore &store, std::string_view search_dir)
-      : store_(store), root_dir_(search_dir.empty() ? "." : search_dir) {}
+class FileGatherer
+{
+public:
+  FileGatherer(ContentAddressedStore& store, std::string_view search_dir)
+    : store_(store), root_dir_(search_dir.empty() ? "." : search_dir)
+  {
+  }
 
   // Find all the files we're interested in, and assemble a list of
   // paths that need refreshing.
-  std::list<filepath_contenthash_t> BuildWorkList(file_time min_freshness) {
+  std::list<filepath_contenthash_t> BuildWorkList(file_time min_freshness)
+  {
     // Gather all *.cc and *.h files; remember content hashes of includes.
     static const std::regex include_re(std::string{kConfig.file_include_re});
     static const std::regex exclude_re(std::string{kConfig.file_exclude_re});
     std::map<std::string, hash_t> header_hashes;
-    for (const auto &dir_entry : fs::recursive_directory_iterator(root_dir_)) {
-      const fs::path &p = dir_entry.path().lexically_normal();
+    for (const auto& dir_entry : fs::recursive_directory_iterator(root_dir_)) {
+      const fs::path& p = dir_entry.path().lexically_normal();
       if (!fs::is_regular_file(p)) {
         continue;
       }
       const std::string file = p.string();
-      if (!kConfig.file_include_re.empty() &&
-          !std::regex_search(file, include_re)) {
+      if (!kConfig.file_include_re.empty() && !std::regex_search(file, include_re)) {
         continue;
       }
-      if (!kConfig.file_exclude_re.empty() &&
-          std::regex_search(file, exclude_re)) {
+      if (!kConfig.file_exclude_re.empty() && std::regex_search(file, exclude_re)) {
         continue;
       }
       const auto extension = p.extension();
@@ -433,8 +438,7 @@ class FileGatherer {
       }
       // Remember content hash of header, so that we can make changed headers
       // influence the hash of a file including this.
-      if (kConfig.revisit_if_any_include_changes &&
-          IsIncludeExtension(extension.string())) {
+      if (kConfig.revisit_if_any_include_changes && IsIncludeExtension(extension.string())) {
         // Since the files might be included sloppily without prefix path,
         // just keep track of the basename (but since there might be collisions,
         // accomodate all of them by xor-ing the hashes).
@@ -447,16 +451,14 @@ class FileGatherer {
     // Create content hash address for the cache and build list of work items.
     // If we want to revisit if headers changed, make hash dependent on them.
     std::list<filepath_contenthash_t> work_queue;
-    const std::regex inc_re(
-        R"""(#\s*include\s+"([0-9a-zA-Z_/-]+\.[a-zA-Z]+)")""");
-    for (filepath_contenthash_t &work_file : files_of_interest_) {
+    const std::regex inc_re(R"""(#\s*include\s+"([0-9a-zA-Z_/-]+\.[a-zA-Z]+)")""");
+    for (filepath_contenthash_t& work_file : files_of_interest_) {
       const auto content = GetContent(work_file.first);
       work_file.second = hashContent(content);
       if (kConfig.revisit_if_any_include_changes) {
         // Update the hash with all the hashes from all include files.
-        for (ReIt it(content.begin(), content.end(), inc_re); it != ReIt();
-             ++it) {
-          const std::string &header_path = (*it)[1].str();
+        for (ReIt it(content.begin(), content.end(), inc_re); it != ReIt(); ++it) {
+          const std::string& header_path = (*it)[1].str();
           const std::string header_basename = fs::path(header_path).filename();
           const auto found = header_hashes.find(header_basename);
           if (found != header_hashes.end()) {
@@ -475,9 +477,9 @@ class FileGatherer {
 
   // Tally up findings for files of interest and assemble in one file.
   // (BuildWorkList() needs to be called first).
-  size_t CreateReport(const fs::path &cache_dir,
-                      std::string_view symlink_detail,
-                      std::string_view symlink_summary) const {
+  size_t CreateReport(const fs::path& cache_dir, std::string_view symlink_detail,
+                      std::string_view symlink_summary) const
+  {
     // Make it possible to keep independent reports for different invocation
     // locations (e.g. two checkouts of the same project) using the same cache.
     const std::string suffix = ToHex(hashContent(fs::current_path().string()));
@@ -490,7 +492,7 @@ class FileGatherer {
     std::map<std::string, int> checks_seen;
     std::unordered_set<std::string> line_already_seen;  // de-dup
     std::ofstream tidy_collect(tidy_outfile);
-    for (const filepath_contenthash_t &f : files_of_interest_) {
+    for (const filepath_contenthash_t& f : files_of_interest_) {
       const std::string tidy = store_.GetContentFor(f);
       if (!tidy.empty()) {
         tidy_collect << f.first.string() << ":\n" << tidy;
@@ -519,12 +521,12 @@ class FileGatherer {
     using check_count_t = std::pair<std::string, int>;
     std::vector<check_count_t> by_count(checks_seen.begin(), checks_seen.end());
     std::stable_sort(by_count.begin(), by_count.end(),
-                     [](const check_count_t &a, const check_count_t &b) {
+                     [](const check_count_t& a, const check_count_t& b) {
                        return b.second < a.second;  // reverse count
                      });
 
     FILE *summary_file = fopen(tidy_summary.c_str(), "wb");
-    for (const auto &counts : by_count) {
+    for (const auto& counts : by_count) {
       fprintf(stdout, "%5d %s\n", counts.second, counts.first.c_str());
       fprintf(summary_file, "%5d %s\n", counts.second, counts.first.c_str());
     }
@@ -536,14 +538,15 @@ class FileGatherer {
     return checks_seen.size();
   }
 
- private:
-  ContentAddressedStore &store_;
+private:
+  ContentAddressedStore& store_;
   const std::string root_dir_;
   std::vector<filepath_contenthash_t> files_of_interest_;
 };
 }  // namespace
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   // Test that key files exist and remember their last change.
   if (!fs::exists(GetClangTidyConfig())) {
     std::cerr << "Need a " << GetClangTidyConfig() << " config file.\n";
@@ -551,8 +554,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::error_code ec;
-  const auto toplevel_build_ts =
-      fs::last_write_time(kConfig.toplevel_build_file, ec);
+  const auto toplevel_build_ts = fs::last_write_time(kConfig.toplevel_build_file, ec);
   if (ec.value() != 0) {
     std::cerr << "Script needs to be executed in toplevel project dir.\n";
     return EXIT_FAILURE;
@@ -588,8 +590,8 @@ int main(int argc, char *argv[]) {
 
   const std::string detailed_report = cache_prefix + "clang-tidy.out";
   const std::string summary = cache_prefix + "clang-tidy.summary";
-  const size_t tidy_count = cc_file_gatherer.CreateReport(
-      runner.project_cache_dir(), detailed_report, summary);
+  const size_t tidy_count =
+    cc_file_gatherer.CreateReport(runner.project_cache_dir(), detailed_report, summary);
 
   return tidy_count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
