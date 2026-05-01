@@ -25,6 +25,10 @@ public:
   void setLoading(bool loading);
   QJsonArray getHistoryAsJson() const;
 
+public slots:
+  void clearChat();
+  void updateTitleWithModel();
+
 signals:
   void messageSubmitted(const QString& text);
   void applyCodeRequested(const QString& code);
@@ -33,12 +37,15 @@ signals:
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event) override;
+  void showEvent(QShowEvent *event) override;
 
 private:
   QWidget *centralWidget;
   QVBoxLayout *layout;
   QListView *chatView;
   QPlainTextEdit *inputField;
+
+  QPushButton *newChatButton;
 
   ChatModel *model;
   ChatDelegate *delegate;

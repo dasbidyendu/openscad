@@ -7,12 +7,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-AIService::AIService(QObject *parent)
-  : QObject(parent),
-    networkManager(new QNetworkAccessManager(this)),
-    endpointUrl(
-      "http://localhost:11434/v1/chat/completions"),  // Default Ollama OpenAI-compatible endpoint
-    modelName("gpt-oss:20b-cloud")                    // Default model
+#include "core/Settings.h"
+
+AIService::AIService(QObject *parent) : QObject(parent), networkManager(new QNetworkAccessManager(this))
 {
 }
 
@@ -22,11 +19,14 @@ AIService::~AIService()
 
 void AIService::sendMessage(const QString& text, const QJsonArray& history, const QString& systemContext)
 {
-  QNetworkRequest request{QUrl(endpointUrl)};
+  QString endpoint = QString::fromStdString(Settings::Settings::aiEndpoint.value());
+  QString model = QString::fromStdString(Settings::Settings::aiModel.value());
+
+  QNetworkRequest request{QUrl(endpoint)};
   request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
   QJsonObject payload;
-  payload["model"] = modelName;
+  payload["model"] = model;
   payload["stream"] = false;  // Phase 1: Full response
 
   QJsonArray messages;
@@ -57,11 +57,14 @@ void AIService::sendMessage(const QString& text, const QJsonArray& history, cons
 void AIService::sendToolResponse(const QString& toolCallId, const QString& content,
                                  const QJsonArray& history, const QString& systemContext)
 {
-  QNetworkRequest request{QUrl(endpointUrl)};
+  QString endpoint = QString::fromStdString(Settings::Settings::aiEndpoint.value());
+  QString model = QString::fromStdString(Settings::Settings::aiModel.value());
+
+  QNetworkRequest request{QUrl(endpoint)};
   request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
   QJsonObject payload;
-  payload["model"] = modelName;
+  payload["model"] = model;
   payload["stream"] = false;
 
   QJsonArray messages;

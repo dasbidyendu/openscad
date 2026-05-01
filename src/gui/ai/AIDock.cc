@@ -1,6 +1,8 @@
 #include "gui/ai/AIDock.h"
 #include "gui/ai/ChatModel.h"
 #include "gui/ai/ChatDelegate.h"
+#include "core/Settings.h"
+#include <QShowEvent>
 
 #include <QVBoxLayout>
 #include <QListView>
@@ -13,12 +15,23 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include <QMenu>
+#include <QAction>
+#include <QClipboard>
+#include <QApplication>
+#include <QRegularExpression>
 #include "gui/qtgettext.h"
 
 AIDock::AIDock(QWidget *parent) : Dock(parent)
 {
   this->centralWidget = new QWidget(this);
   this->layout = new QVBoxLayout(this->centralWidget);
+
+  QHBoxLayout *topLay = new QHBoxLayout();
+  this->newChatButton = new QPushButton(_("New Chat"), this->centralWidget);
+  connect(this->newChatButton, &QPushButton::clicked, this, &AIDock::clearChat);
+  topLay->addStretch();
+  topLay->addWidget(this->newChatButton);
 
   this->chatView = new QListView(this->centralWidget);
   this->model = new ChatModel(this);
@@ -29,6 +42,37 @@ AIDock::AIDock(QWidget *parent) : Dock(parent)
   this->chatView->setSelectionMode(QAbstractItemView::NoSelection);
   this->chatView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   this->chatView->setSpacing(5);
+
+  this->chatView->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this->chatView, &QListView::customContextMenuRequested, this, [this](const QPoint& pos) {
+    QModelIndex index = this->chatView->indexAt(pos);
+    if (index.isValid()) {
+      QMenu menu;
+      QAction *copyAction = menu.addAction(_("Copy Message"));
+      QAction *copyCodeAction = menu.addAction(_("Copy Code Blocks Only"));
+
+      QAction *selectedItem = menu.exec(this->chatView->viewport()->mapToGlobal(pos));
+      if (selectedItem == copyAction) {
+        QString text = index.data(ChatModel::ChatRoles::TextRole).toString();
+        QApplication::clipboard()->setText(text);
+      } else if (selectedItem == copyCodeAction) {
+        QString text = index.data(ChatModel::ChatRoles::TextRole).toString();
+        QRegularExpression regex("```(?:\\w*\\n)?(.*?)```",
+                                 QRegularExpression::DotMatchesEverythingOption);
+        QRegularExpressionMatchIterator i = regex.globalMatch(text);
+        QStringList codes;
+        while (i.hasNext()) {
+          QRegularExpressionMatch match = i.next();
+          codes << match.captured(1).trimmed();
+        }
+        if (!codes.isEmpty()) {
+          QApplication::clipboard()->setText(codes.join("\n\n"));
+        } else {
+          QApplication::clipboard()->setText(text);  // Fallback to all if no code blocks
+        }
+      }
+    }
+  });
 
   this->inputField = new QPlainTextEdit(this->centralWidget);
   this->inputField->setMaximumHeight(100);
@@ -54,6 +98,7 @@ AIDock::AIDock(QWidget *parent) : Dock(parent)
   applyLay->addWidget(this->applyButton);
   this->applyPanel->hide();
 
+  this->layout->addLayout(topLay);
   this->layout->addWidget(this->chatView);
   this->layout->addWidget(this->applyPanel);
   this->layout->addWidget(this->inputField);
@@ -79,6 +124,28 @@ AIDock::AIDock(QWidget *parent) : Dock(parent)
 AIDock::~AIDock()
 {
   delete this->centralWidget;
+}
+
+void AIDock::clearChat()
+{
+  this->model->clear();
+  this->model->addMessage(
+    _("Hello! I'm your AI Assistant. How can I help you with your OpenSCAD model today?"), false);
+}
+
+void AIDock::updateTitleWithModel()
+{
+  QString modelName = QString::fromStdString(Settings::Settings::aiModel.value());
+  if (modelName.isEmpty()) modelName = "AI Chat";
+  else modelName = QString("AI Chat (%1)").arg(modelName);
+  this->setWindowTitle(modelName);
+  this->setName(modelName);
+}
+
+void AIDock::showEvent(QShowEvent *event)
+{
+  updateTitleWithModel();
+  Dock::showEvent(event);
 }
 
 void AIDock::addMessage(const QString& text, bool isUser)

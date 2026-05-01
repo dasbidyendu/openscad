@@ -49,6 +49,13 @@
 #include <QStringList>
 #include <QTextDocument>
 #include <QWidget>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QPlainTextEdit>
+#include <QStringList>
+#include <QTextDocument>
+#include <QWidget>
 #include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <list>
@@ -119,6 +126,7 @@ Preferences::Preferences(QWidget *parent) : QMainWindow(parent)
   AxisConfig->init();
   setupFeaturesPage();
   setup3DPrintPage();
+  setupAIPage();
   updateGUI();
 }
 
@@ -470,6 +478,61 @@ void Preferences::setup3DPrintPage()
   if (it != services.end()) {
     comboBoxDefaultPrintService->setCurrentText(it->second);
   }
+}
+
+void Preferences::setupAIPage()
+{
+  QWidget *pageAI = new QWidget(this->stackedWidget);
+  pageAI->setObjectName("pageAI");
+  QVBoxLayout *topLayout = new QVBoxLayout(pageAI);
+
+  QGroupBox *group = new QGroupBox(_("AI Configuration"), pageAI);
+  QFormLayout *form = new QFormLayout(group);
+
+  QLineEdit *endpointEdit = new QLineEdit(group);
+  endpointEdit->setObjectName("aiEndpointEdit");
+  endpointEdit->setPlaceholderText("http://localhost:11434/v1/chat/completions");
+  endpointEdit->setText(QString::fromStdString(Settings::Settings::aiEndpoint.value()));
+  form->addRow(_("API Endpoint:"), endpointEdit);
+
+  QLineEdit *modelEdit = new QLineEdit(group);
+  modelEdit->setObjectName("aiModelEdit");
+  modelEdit->setPlaceholderText("gpt-oss:20b-cloud");
+  modelEdit->setText(QString::fromStdString(Settings::Settings::aiModel.value()));
+  form->addRow(_("Model Name:"), modelEdit);
+
+  QPlainTextEdit *promptEdit = new QPlainTextEdit(group);
+  promptEdit->setObjectName("aiPromptEdit");
+  promptEdit->setPlainText(QString::fromStdString(Settings::Settings::aiSystemPrompt.value()));
+  form->addRow(_("System Prompt:"), promptEdit);
+
+  topLayout->addWidget(group);
+  topLayout->addStretch();
+
+  stackedWidget->addWidget(pageAI);
+
+  QAction *prefsActionAI = new QAction(QIcon(":/icons/ai-assistant.png"), _("AI"), this);
+  prefsActionAI->setCheckable(true);
+  toolBar->addAction(prefsActionAI);
+
+  // Find the action group
+  QActionGroup *group_actions = qobject_cast<QActionGroup *>(prefPages.keys().first()->actionGroup());
+  if (group_actions) {
+    addPrefPage(group_actions, prefsActionAI, pageAI);
+  }
+
+  connect(endpointEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
+    Settings::Settings::aiEndpoint.setValue(text.toStdString());
+    writeSettings();
+  });
+  connect(modelEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
+    Settings::Settings::aiModel.setValue(text.toStdString());
+    writeSettings();
+  });
+  connect(promptEdit, &QPlainTextEdit::textChanged, this, [this, promptEdit]() {
+    Settings::Settings::aiSystemPrompt.setValue(promptEdit->toPlainText().toStdString());
+    writeSettings();
+  });
 }
 
 void Preferences::on_colorSchemeChooser_itemSelectionChanged()

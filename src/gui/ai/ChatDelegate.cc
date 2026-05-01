@@ -6,6 +6,7 @@
 #include <QAbstractTextDocumentLayout>
 #include <QPalette>
 #include <QApplication>
+#include <QtCore/qglobal.h>
 
 ChatDelegate::ChatDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
@@ -34,11 +35,22 @@ void ChatDelegate::paint(QPainter *painter, const QStyleOptionViewItem& option,
   QTextDocument doc;
   doc.setDefaultStyleSheet(
     QString("body { color: %1; font-family: sans-serif; font-size: 13px; }").arg(textColor.name()));
-  doc.setHtml(text);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+  doc.setMarkdown(text);
+#else
+  QString htmlText = text;
+  htmlText.replace("<", "&lt;").replace(">", "&gt;");
+  htmlText.replace("\n", "<br>");
+  doc.setHtml(htmlText);
+#endif
 
   int maxWidth = option.rect.width() * 0.8;
   if (maxWidth <= 0) maxWidth = 200;
   doc.setTextWidth(maxWidth);
+
+  // Use document layout to get actual exact height
+  doc.documentLayout()->documentSize();
 
   QSize size = doc.size().toSize();
   int bubbleWidth = size.width() + 2 * padding;
@@ -92,15 +104,25 @@ void ChatDelegate::paint(QPainter *painter, const QStyleOptionViewItem& option,
 QSize ChatDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
   QString text = index.data(ChatModel::ChatRoles::TextRole).toString();
-  int maxWidth = option.rect.width() * 0.75;
+  int maxWidth = option.rect.width() * 0.8;
   if (maxWidth <= 0) maxWidth = 300;
 
   bool isLoading = index.data(ChatModel::ChatRoles::IsLoadingRole).toBool();
   if (isLoading) return QSize(option.rect.width(), 80);
 
   QTextDocument doc;
-  doc.setHtml(text);
+  doc.setDefaultStyleSheet(QString("body { font-family: sans-serif; font-size: 13px; }"));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+  doc.setMarkdown(text);
+#else
+  QString htmlText = text;
+  htmlText.replace("<", "&lt;").replace(">", "&gt;");
+  htmlText.replace("\n", "<br>");
+  doc.setHtml(htmlText);
+#endif
   doc.setTextWidth(maxWidth);
+  doc.documentLayout()->documentSize();
 
-  return QSize(option.rect.width(), (int)doc.size().height() + 2 * padding);
+  int height = doc.size().height() + padding;
+  return QSize(option.rect.width(), height + 10);  // Add a small margin between bubbles
 }

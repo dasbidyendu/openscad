@@ -3613,27 +3613,7 @@ void MainWindow::setupAIDock()
   QObject::connect(this->aiDock, &Dock::visibilityChanged, this, &MainWindow::onAIDockVisibilityChanged);
 
   QObject::connect(this->aiDock, &AIDock::messageSubmitted, this, [this](const QString& text) {
-    QString context =
-      "You are the OpenSCAD Expert Assistant. You provide high-quality, surgical, and logical OpenSCAD "
-      "code fixes.\n\n"
-      "### YOUR CORE RULES:\n"
-      "1. **Surgical Excellence**: If the user has a minor error (missing semicolon, wrong bracket), "
-      "fix ONLY that specific line. Do NOT rewrite the entire script, do NOT rename variables, and "
-      "do NOT change the overall logic unless explicitly asked.\n"
-      "2. **OpenSCAD Syntax Mastery**:\n"
-      "   - **Modifiers**: `color()`, `rotate()`, `translate()`, etc., are MODIFIERS. They apply to the "
-      "next child or block. NEVER assign them to variables like `c = color(\"red\");`. Instead, use "
-      "`color(\"red\") cube(10);`.\n"
-      "   - **Semicolons**: Every assignment (e.g., `x = 5;`) and every module instantiation "
-      "(e.g., `cube(10);`) MUST end with a semicolon. Semicolons are NOT used after module "
-      "definitions `module name() { ... }` or after blocks `{ ... }`.\n"
-      "3. **Tool Workflow**:\n"
-      "   - Use `get_editor_code()` if you need to see the latest script state.\n"
-      "   - Use `set_editor_code()` to propose the fix. Always return the COMPLETE fixed script "
-      "but minimize changes.\n"
-      "   - Use `trigger_preview()` once after setting the code to validate the result.\n"
-      "4. **Formatting**: Use ACTUAL NEWLINES in your code output. Never use literal '\\n' sequences.\n"
-      "5. **Tone**: Technical, concise, and helpful. Avoid long conversational filler.\n";
+    QString context = QString::fromStdString(Settings::Settings::aiSystemPrompt.value());
     if (this->activeEditor) {
       context += QString("\n### Active Script Context:\n```openscad\n%1\n```\n")
                    .arg(this->activeEditor->toPlainText());
@@ -3790,8 +3770,10 @@ void MainWindow::setupDocks()
     {fontListDock, _("&Font List")},
     {colorListDock, _("C&olor List")},
     {viewportControlDock, _("&Viewport-Control")},
-    {aiDock, _("&AI Chat")},
   };
+  if (!Settings::Settings::aiEndpoint.value().empty()) {
+    docks.push_back({aiDock, _("&AI Chat")});
+  }
   // clang-format off
 
   // Connect the menu "Windows/Navigation" to slot that process it by opening in a pop menu
