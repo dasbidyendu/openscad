@@ -8,11 +8,16 @@ The AI subsystem provides a conversational interface that can "see" the workspac
 
 ### Key Components
 
-1.  **AIService (`src/gui/ai/AIService.h/cc`)**:
-    - Manages the network protocol (REST).
-    - Handles tool definitions (Function Calling).
-    - Routes model responses back to the application.
-    - **Protocol**: OpenAI-compatible JSON over HTTP.
+1.  **AIService Core (`src/ai/AIService.h/cc`)**:
+    - **Qt-Free**: Pure C++ implementation using **Boost Asio**.
+    - Manages the network protocol (HTTP/HTTPS) via a minimal `HttpClient`.
+    - Handles tool definitions (Function Calling) and JSON processing.
+    - Runs in its own worker thread for non-blocking I/O.
+
+2.  **QtAIService Bridge (`src/gui/ai/QtAIService.h/cc`)**:
+    - Wraps the core service for use in the Qt GUI.
+    - Handles conversion between Qt types (QString, QJson) and standard C++ types.
+    - Emits signals for UI updates.
 
 2.  **AIDock (`src/gui/ai/AIDock.h/cc`)**:
     - The primary UI for user interaction.

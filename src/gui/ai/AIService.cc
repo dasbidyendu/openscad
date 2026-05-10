@@ -1,3 +1,5 @@
+//--DEPRECATED - Moved to use Asio for Headless support
+
 #include "gui/ai/AIService.h"
 
 #include <QNetworkRequest>
@@ -8,6 +10,7 @@
 #include <QJsonArray>
 
 #include "core/Settings.h"
+#include <boost/asio.hpp>
 
 AIService::AIService(QObject *parent) : QObject(parent), networkManager(new QNetworkAccessManager(this))
 {

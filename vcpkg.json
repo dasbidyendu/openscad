@@ -4,6 +4,9 @@
   "dependencies": [
     "boost-regex",
     "boost-program-options",
+    "boost-asio",
+    "boost-system",
+    "openssl",
     "eigen3",
     "cgal",
     "cairo",

@@ -479,10 +479,10 @@ if (MSVC)
   message(STATUS "Eigen: ${Eigen3_VERSION}")
 
   set(Boost_USE_STATIC_LIBS TRUE)
-  find_package(Boost 1.70 REQUIRED COMPONENTS regex program_options)
+  find_package(Boost 1.70 REQUIRED COMPONENTS regex program_options system)
   message(STATUS "Boost: ${Boost_VERSION}")
   target_compile_definitions(OpenSCADLibInternal PRIVATE BOOST_DLL_USE_STD_FS)
-  target_link_libraries(OpenSCADLibInternal PUBLIC Boost::headers Boost::regex Boost::program_options)
+  target_link_libraries(OpenSCADLibInternal PUBLIC Boost::headers Boost::regex Boost::program_options Boost::system)
   target_link_libraries(svg PUBLIC Boost::headers)
 
   find_package(harfbuzz CONFIG REQUIRED)
@@ -527,10 +527,10 @@ else()
   target_link_libraries(svg PUBLIC Eigen3::Eigen)
   message(STATUS "Eigen: ${Eigen3_VERSION}")
 
-  find_package(Boost 1.70 REQUIRED QUIET COMPONENTS regex program_options)
+  find_package(Boost 1.70 REQUIRED QUIET COMPONENTS regex program_options system)
   message(STATUS "Boost: ${Boost_VERSION}")
   target_compile_definitions(OpenSCADLibInternal PRIVATE BOOST_DLL_USE_STD_FS)
-  target_link_libraries(OpenSCADLibInternal PUBLIC Boost::headers Boost::regex Boost::program_options)
+  target_link_libraries(OpenSCADLibInternal PUBLIC Boost::headers Boost::regex Boost::program_options Boost::system)
   target_link_libraries(svg PUBLIC Boost::headers)
 
   find_package(HarfBuzz 0.9.19 REQUIRED QUIET)
@@ -612,6 +612,9 @@ find_package(LibXml2 2.9 REQUIRED QUIET)
 message(STATUS "LibXml2: ${LIBXML2_VERSION_STRING}")
 target_link_libraries(OpenSCADLibInternal PUBLIC LibXml2::LibXml2)
 target_link_libraries(svg PUBLIC LibXml2::LibXml2)
+
+find_package(OpenSSL REQUIRED)
+target_link_libraries(OpenSCADLibInternal PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 
 if(ENABLE_PYTHON)
   find_package(Python REQUIRED COMPONENTS Interpreter Development)
@@ -1326,10 +1329,10 @@ set(GUI_SOURCES
   src/gui/ai/ChatModel.cc
   src/gui/ai/ChatDelegate.h
   src/gui/ai/ChatDelegate.cc
-  src/gui/ai/AIService.h
-  src/gui/ai/AIService.cc
   src/gui/ai/DiffDialog.h
   src/gui/ai/DiffDialog.cc
+  src/gui/ai/QtAIService.h
+  src/gui/ai/QtAIService.cc
   src/gui/WindowManager.cc
   src/gui/IgnoreWheelWhenNotFocused.cc
   src/gui/input/AxisConfigWidget.cc
@@ -1404,7 +1407,7 @@ set(GUI_HEADERS
     src/gui/TabManager.h
     src/gui/UIUtils.h
     src/gui/ViewportControl.h
-    src/gui/ai/AIService.h
+    src/gui/ai/QtAIService.h
     src/gui/ai/DiffDialog.h
     src/gui/WindowManager.h
     src/gui/qt-obsolete.h
@@ -1470,6 +1473,8 @@ list(APPEND Sources
   ${CMAKE_BINARY_DIR}/version.cc
   ${CORE_SOURCES}
   ${OFFSCREEN_SOURCES}
+  src/ai/AIService.cc
+  src/ai/HttpClient.cc
 )
 
 set_source_files_properties(

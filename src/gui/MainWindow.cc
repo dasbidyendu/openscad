@@ -116,7 +116,7 @@
 #include "gui/Dock.h"
 #include "gui/ai/AIDock.h"
 #include "gui/ai/DiffDialog.h"
-#include "gui/ai/AIService.h"
+#include "gui/ai/QtAIService.h"
 #include "gui/Editor.h"
 #include "gui/Export3mfDialog.h"
 #include "gui/ExportPdfDialog.h"
@@ -3608,7 +3608,7 @@ void MainWindow::setupAIDock()
   addDockWidget(Qt::RightDockWidgetArea, this->aiDock);
   this->aiDock->hide();
 
-  this->aiService = new AIService(this);
+  this->aiService = new QtAIService(this);
 
   QObject::connect(this->aiDock, &Dock::visibilityChanged, this, &MainWindow::onAIDockVisibilityChanged);
 
@@ -3641,10 +3641,10 @@ void MainWindow::setupAIDock()
   QObject::connect(this->aiDock, &AIDock::reviewCodeRequested, this,
                    &MainWindow::onAIReviewCodeRequested);
 
-  QObject::connect(this->aiService, &AIService::responseReceived, this,
+  QObject::connect(this->aiService, &QtAIService::responseReceived, this,
                    &MainWindow::onAIResponseReceived);
-  QObject::connect(this->aiService, &AIService::errorOccurred, this, &MainWindow::onAIErrorOccurred);
-  QObject::connect(this->aiService, &AIService::toolCallReceived, this,
+  QObject::connect(this->aiService, &QtAIService::errorOccurred, this, &MainWindow::onAIErrorOccurred);
+  QObject::connect(this->aiService, &QtAIService::toolCallReceived, this,
                    &MainWindow::onAIToolCallReceived);
 }
 

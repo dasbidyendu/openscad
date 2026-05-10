@@ -46,7 +46,7 @@ Q_IMPORT_PLUGIN(QSvgPlugin)
 class BuiltinContext;
 class CGALWorker;
 class AIDock;
-class AIService;
+class QtAIService;
 class CSGNode;
 class CSGProducts;
 class FontListDialog;
@@ -104,7 +104,7 @@ public:
   EditorInterface *activeEditor = nullptr;
   TabManager *tabManager;
   AIDock *aiDock;
-  AIService *aiService;
+  QtAIService *aiService;
 
   std::shared_ptr<const Geometry> rootGeom;
   std::shared_ptr<Renderer> geomRenderer;
