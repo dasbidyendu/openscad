@@ -5,6 +5,7 @@
     "boost-regex",
     "boost-program-options",
     "boost-asio",
+    "boost-beast",
     "boost-system",
     "openssl",
     "eigen3",

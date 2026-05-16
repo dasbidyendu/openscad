@@ -478,7 +478,7 @@ if (MSVC)
   target_link_libraries(svg PUBLIC Eigen3::Eigen)
   message(STATUS "Eigen: ${Eigen3_VERSION}")
 
-  set(Boost_USE_STATIC_LIBS TRUE)
+  # Boost 1.70+ includes Asio and Beast. Beast is header-only but depends on System/Asio.
   find_package(Boost 1.70 REQUIRED COMPONENTS regex program_options system)
   message(STATUS "Boost: ${Boost_VERSION}")
   target_compile_definitions(OpenSCADLibInternal PRIVATE BOOST_DLL_USE_STD_FS)
@@ -527,6 +527,7 @@ else()
   target_link_libraries(svg PUBLIC Eigen3::Eigen)
   message(STATUS "Eigen: ${Eigen3_VERSION}")
 
+  # Boost 1.70+ includes Asio and Beast. Beast is header-only but depends on System/Asio.
   find_package(Boost 1.70 REQUIRED QUIET COMPONENTS regex program_options system)
   message(STATUS "Boost: ${Boost_VERSION}")
   target_compile_definitions(OpenSCADLibInternal PRIVATE BOOST_DLL_USE_STD_FS)
